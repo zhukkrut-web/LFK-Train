@@ -129,6 +129,23 @@ header .lead { max-width: 62ch; color: var(--muted); font-size: 17px; }
 .swap { justify-self: start; font: 500 13px var(--f-body); color: var(--blue); background: none; border: 0; padding: 0; cursor: pointer; }
 .swap:hover { text-decoration: underline; }
 .swap:focus-visible { outline: 2px solid var(--blue); outline-offset: 2px; }
+.card-actions { display: flex; flex-wrap: wrap; gap: 6px 16px; }
+.station .fig, .board-fig { cursor: zoom-in; }
+/* full-screen exercise viewer */
+.viewer { position: fixed; inset: 0; z-index: 50; background: var(--bg); overflow-y: auto; display: grid; grid-template-rows: auto 1fr; gap: 16px;
+  padding-top: max(20px, env(safe-area-inset-top, 0px)); padding-bottom: max(20px, env(safe-area-inset-bottom, 0px));
+  padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); }
+.viewer-top { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px; max-width: 1200px; width: 100%; margin: 0 auto; }
+.viewer-top h2 { font-size: clamp(22px, 4vw, 36px); }
+.viewer-actions { display: flex; flex-wrap: wrap; gap: 8px; }
+.viewer-body { display: grid; grid-template-columns: minmax(0, 3fr) minmax(0, 2fr); gap: 28px; align-items: start; max-width: 1200px; width: 100%; margin: 0 auto; }
+@media (max-width: 760px) { .viewer-body { grid-template-columns: 1fr; } }
+.viewer-fig { height: min(68vh, 620px); background: var(--surface); border: 1px solid var(--line); border-radius: 16px; padding: 12px; cursor: default; }
+.fig.viewer-fig .cue { font-size: clamp(20px, 3vw, 32px); min-height: 2.4em; }
+.viewer-info { display: grid; gap: 14px; font-size: 18px; line-height: 1.5; min-width: 0; }
+.viewer-info ol { margin: 0; padding-left: 1.3em; display: grid; gap: 8px; }
+.viewer-info .label { font-family: var(--f-mono); font-size: 12px; letter-spacing: .1em; text-transform: uppercase; color: var(--muted); }
+.viewer-info .warn-list { color: var(--muted); }
 
 /* AI coach */
 .coach { display: grid; gap: 16px; background: var(--surface); border: 1px solid var(--line); border-radius: 16px; padding: 22px; }
@@ -220,7 +237,7 @@ header .lead { max-width: 62ch; color: var(--muted); font-size: 17px; }
 .station .fig { height: 178px; background: var(--bg); border-radius: 8px; padding: 6px; }
 .board-fig { width: 180px; height: 200px; flex: 0 0 auto; }
 .board .fig { --fig-shorts: #7F93B3; --fig-shoe: #E5ECF5; --fig-shirt: #5B8BF0; }
-.board .fig .cue { color: #FF8A70; font-size: 14px; }
+.board .fig .cue { color: #FF8A70; font-size: 17px; }
 .board .fig .far { opacity: .45; }
 .board .fig .head { fill: var(--fig-skin); }
 .board .fig .ground { stroke: color-mix(in srgb, var(--board-fg) 25%, transparent); }
@@ -421,6 +438,27 @@ footer { font-size: 13px; color: var(--muted); }
   </section>
 
   <footer>Упражнения без инвентаря. Время работы и отдыха подбирается по уровню: новичок 20/40 с, средний 30/30 с, продвинутый 40/20 с; между кругами отдых 60 с.</footer>
+  <div class="viewer" id="viewer" hidden role="dialog" aria-modal="true" aria-labelledby="vName">
+    <div class="viewer-top">
+      <h2 id="vName"></h2>
+      <div class="viewer-actions">
+        <button class="btn ghost" id="vSpeak">Озвучить технику</button>
+        <button class="btn ghost" id="vFull">Во весь экран</button>
+        <button class="btn" id="vClose">Закрыть</button>
+      </div>
+    </div>
+    <div class="viewer-body">
+      <div class="fig viewer-fig" id="vFig"></div>
+      <div class="viewer-info">
+        <span class="label">Как делать</span>
+        <p id="vTip"></p>
+        <span class="label">По фазам</span>
+        <ol id="vSteps"></ol>
+        <span class="label">Частые ошибки</span>
+        <p class="warn-list" id="vMist"></p>
+      </div>
+    </div>
+  </div>
 </div>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
@@ -918,7 +956,7 @@ function build() {
       <h3>${e.n}</h3>
       ${h.length ? `<span class="good">Полезно: ${h.join(", ")}</span>` : ""}
       <p>${e.t}</p>
-      <button class="swap" data-i="${i}">Заменить упражнение</button>
+      <div class="card-actions"><button class="swap zoom" data-z="${i}">Смотреть крупно</button><button class="swap speak" data-s="${i}">Озвучить</button><button class="swap" data-i="${i}">Заменить упражнение</button></div>
     </li>`).join("");
   document.querySelectorAll("#stations .fig").forEach(el => makeFig(el, el.dataset.ex));
   $("boardFig")._name = null;
@@ -1004,7 +1042,7 @@ function next() {
   if (t === "work") { beep(1046, 0.4); say(`Работа! ${plan[s.ex].n}`); }
   else if (t === "rest") {
     beep(523, 0.4);
-    say(s.roundBreak ? `Круг ${s.round} завершён. Отдых минута. Оцени, насколько было тяжело.` : `Отдых. Дальше: ${plan[s.ex].n}`);
+    say(s.roundBreak ? `Круг ${s.round} завершён. Отдых минута. Оцени, насколько было тяжело. Первое упражнение нового круга: ${plan[s.ex].n}.` : `Отдых. Дальше: ${techText(plan[s.ex])}`);
   }
   else if (t === "done") { beep(784, 0.2); setTimeout(() => beep(1046, 0.5), 220); stop(); say("Тренировка завершена. Молодец! Оцени последний круг, а потом сделай заминку и растяжку."); }
   if (running) endAt = Date.now() + remaining * 1000;
@@ -1029,7 +1067,7 @@ function start() {
   running = true; endAt = Date.now() + remaining * 1000;
   timer = setInterval(tick, 200);
   beep(880, 0.1);
-  if (fresh) say(`Приготовься. Первое упражнение: ${plan[0].n}`);
+  if (fresh) say(`Приготовься. Первое упражнение: ${techText(plan[0])}`);
   render();
 }
 function stop() { running = false; clearInterval(timer); timer = null; }
@@ -1053,7 +1091,47 @@ $("gen").onclick = generate;
 document.querySelectorAll(".settings input[type=radio]").forEach(i => i.addEventListener("change", build));
 $("cnt").addEventListener("input", e => { $("cntOut").textContent = e.target.value; });
 $("cnt").addEventListener("change", generate);
-$("stations").addEventListener("click", e => { const b = e.target.closest(".swap"); if (b) swapOne(+b.dataset.i); });
+$("stations").addEventListener("click", e => {
+  const b = e.target.closest(".swap");
+  if (b?.dataset.z != null) return openViewer(plan[+b.dataset.z]);
+  if (b?.dataset.s != null) return speakTech(plan[+b.dataset.s]);
+  if (b?.dataset.i != null) return swapOne(+b.dataset.i);
+  const f = e.target.closest(".fig");
+  if (f) openViewer(plan[+f.closest(".station").id.slice(2)]);
+});
+$("boardFig").addEventListener("click", () => { const s = steps[idx]; if (s && s.type !== "done") openViewer(plan[s.ex]); });
+
+// Full-screen viewer: big figure, big cues, technique, mistakes
+// cue i is shown while moving INTO pose i, so the movement starts with cue 1
+const phases = e => { const c = CUES[e.n] || []; return uniqSeq(c.slice(1).concat(c.slice(0, 1))); };
+const techText = e => `${e.n}. ${e.t} ${phases(e).length ? phases(e).join(". ") + "." : ""}`;
+function speakTech(e) { if (!voiceOn) { voiceOn = true; $("voice").textContent = "Голос: вкл"; $("voice").setAttribute("aria-pressed", true); } say(techText(e)); }
+let viewerEx = null, viewerReturn = null;
+function openViewer(e) {
+  if (!e) return;
+  viewerEx = e; viewerReturn = document.activeElement;
+  $("vName").textContent = e.n;
+  $("vTip").textContent = e.t;
+  $("vSteps").innerHTML = phases(e).map(c => `<li>${c}</li>`).join("");
+  $("vMist").textContent = GROUP_MISTAKES[e.g] ? GROUP_MISTAKES[e.g][0].toUpperCase() + GROUP_MISTAKES[e.g].slice(1) + "." : "";
+  $("viewer").hidden = false;
+  document.body.style.overflow = "hidden";
+  makeFig($("vFig"), e.n);
+  $("vClose").focus();
+}
+function closeViewer() {
+  if ($("viewer").hidden) return;
+  $("viewer").hidden = true;
+  document.body.style.overflow = "";
+  $("vFig")._fig = null; $("vFig").innerHTML = "";
+  if (document.fullscreenElement) document.exitFullscreen?.().catch(() => {});
+  viewerReturn?.focus?.();
+}
+$("vClose").onclick = closeViewer;
+$("vSpeak").onclick = () => viewerEx && speakTech(viewerEx);
+$("vFull").hidden = !document.fullscreenEnabled;
+$("vFull").onclick = () => { const v = $("viewer"); (document.fullscreenElement ? document.exitFullscreen() : v.requestFullscreen()).catch(() => { $("vFull").hidden = true; }); };
+document.addEventListener("keydown", e => { if (e.key === "Escape" && !document.fullscreenElement) closeViewer(); });
 
 function zones() {
   const age = Math.min(80, Math.max(7, +$("age").value || 19));
