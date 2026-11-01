@@ -202,6 +202,85 @@ header .lead { max-width: 62ch; color: var(--muted); font-size: 17px; }
 .qr img, .qr canvas { width: 100% !important; height: 100% !important; display: block; }
 .qr-box p { font-size: 14px; color: var(--muted); min-width: 0; }
 
+/* group mode */
+.group { background: var(--surface); border: 1px solid var(--line); border-radius: 14px; }
+.group > summary { list-style: none; cursor: pointer; padding: 18px 20px; display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 6px 16px; }
+.group > summary::-webkit-details-marker { display: none; }
+.group > summary h2 { font-size: 20px; }
+.group > summary .g-toggle { font-size: 14px; color: var(--blue); font-weight: 600; }
+.group[open] > summary .g-toggle::after { content: " ▲"; }
+.group:not([open]) > summary .g-toggle::after { content: " ▼"; }
+.group > summary:focus-visible { outline: 2px solid var(--blue); outline-offset: -2px; border-radius: 14px; }
+.g-body { display: grid; gap: 16px; padding: 0 20px 20px; }
+.g-form { display: grid; gap: 10px; padding: 16px; border-radius: 12px; background: var(--bg); }
+.g-form-row { display: flex; flex-wrap: wrap; gap: 8px; }
+.g-form input[type=text] { flex: 1 1 220px; min-width: 0; font: 16px var(--f-body); padding: 10px 12px; border-radius: 10px; border: 1.5px solid var(--line); background: var(--surface); color: var(--fg); }
+.g-form input[type=text]:focus-visible { outline: 2px solid var(--blue); }
+.g-list { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 8px; }
+.g-list:empty { display: none; }
+.g-item { display: grid; grid-template-columns: 1fr auto; gap: 6px 8px; align-items: start; padding: 10px 12px; border: 1px solid var(--line); border-radius: 10px; min-width: 0; }
+.g-item b { overflow-wrap: anywhere; }
+.g-item .g-conds { grid-column: 1 / -1; display: flex; flex-wrap: wrap; gap: 4px; }
+.g-tag { font-size: 12px; font-weight: 600; padding: 2px 8px; border-radius: 99px; background: color-mix(in srgb, var(--rest) 16%, transparent); color: var(--rest); }
+.g-tag.none { background: var(--bg); color: var(--muted); }
+.g-del { font: 600 18px/1 var(--f-body); background: none; border: 0; color: var(--muted); cursor: pointer; padding: 2px 6px; border-radius: 6px; }
+.g-del:hover { color: var(--accent); }
+.g-del:focus-visible { outline: 2px solid var(--blue); }
+.g-empty { color: var(--muted); }
+.g-summary { display: grid; gap: 8px; }
+.g-summary ul { margin: 0; padding-left: 1.2em; display: grid; gap: 4px; }
+.g-actions { display: flex; flex-wrap: wrap; gap: 8px; }
+.g-status { font-size: 14px; color: var(--rest); font-weight: 600; min-height: 1.4em; }
+.g-privacy { font-size: 13px; color: var(--muted); }
+
+/* fitness test + diary */
+.tool { display: grid; gap: 16px; background: var(--surface); border: 1px solid var(--line); border-radius: 16px; padding: 22px; }
+.tool-head { display: grid; gap: 6px; }
+.tool-head .row { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: end; gap: 10px; }
+.tests { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 12px; }
+.test { display: grid; gap: 10px; align-content: start; padding: 16px; border-radius: 12px; background: var(--bg); min-width: 0; }
+.test ol { margin: 0; padding-left: 1.2em; display: grid; gap: 4px; font-size: 14px; color: var(--muted); }
+.test .warn { font-size: 13px; color: var(--accent); }
+.t-inputs { display: flex; flex-wrap: wrap; gap: 8px; }
+.t-inputs label { display: grid; gap: 4px; font-size: 12px; font-family: var(--f-mono); text-transform: uppercase; letter-spacing: .06em; color: var(--muted); }
+.t-inputs input, .t-sel { font: 600 16px var(--f-mono); width: 6.5em; padding: 8px 10px; border-radius: 8px; border: 1.5px solid var(--line); background: var(--surface); color: var(--fg); }
+.t-inputs input:focus-visible, .t-sel:focus-visible { outline: 2px solid var(--blue); }
+.t-timer { font: 600 14px var(--f-mono); color: var(--blue); min-height: 1.3em; font-variant-numeric: tabular-nums; }
+.t-btn { justify-self: start; font: 600 14px var(--f-body); padding: 8px 12px; border-radius: 8px; border: 1.5px solid var(--line); background: var(--surface); color: var(--fg); cursor: pointer; }
+.t-btn:focus-visible { outline: 2px solid var(--blue); }
+.t-btn.on { border-color: var(--accent); color: var(--accent); }
+.t-result { display: grid; gap: 12px; padding: 16px; border-radius: 12px; border: 1.5px solid var(--rest); }
+.t-table { width: 100%; border-collapse: collapse; font-size: 15px; }
+.t-table td { padding: 6px 8px; border-bottom: 1px solid var(--line); }
+.t-table td:nth-child(2) { font-family: var(--f-mono); font-variant-numeric: tabular-nums; text-align: right; }
+.grade { font-size: 12px; font-weight: 700; padding: 2px 8px; border-radius: 99px; white-space: nowrap; }
+.grade.g3 { background: color-mix(in srgb, var(--rest) 18%, transparent); color: var(--rest); }
+.grade.g2 { background: color-mix(in srgb, #D9971E 20%, transparent); color: #B07812; }
+.grade.g1 { background: color-mix(in srgb, var(--accent) 16%, transparent); color: var(--accent); }
+.t-verdict { font-size: 17px; }
+.tiles { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 10px; }
+.tile { padding: 14px 16px; border-radius: 12px; background: var(--bg); display: grid; gap: 2px; }
+.tile b { font-family: var(--f-mono); font-size: 28px; font-variant-numeric: tabular-nums; }
+.tile span { font-size: 13px; color: var(--muted); }
+.charts { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 12px; }
+.chart { padding: 14px; border-radius: 12px; background: var(--bg); display: grid; gap: 6px; min-width: 0; }
+.chart h3 { font-size: 15px; }
+.chart .sub { font-size: 13px; color: var(--muted); }
+.chart svg { width: 100%; height: auto; display: block; overflow: visible; }
+.chart .grid-l { stroke: var(--line); stroke-width: 1; }
+.chart .ref-l { stroke: var(--muted); stroke-width: 1; stroke-dasharray: 4 4; opacity: .7; }
+.chart text { fill: var(--muted); font: 11px var(--f-body); }
+.chart text.val { fill: var(--fg); font-weight: 700; font-family: var(--f-mono); }
+.chart .bar { fill: var(--blue); }
+.chart .bar:hover, .chart .pt:hover { opacity: .8; }
+.chart .ln { fill: none; stroke: var(--blue); stroke-width: 2; stroke-linejoin: round; }
+.chart .pt { fill: var(--blue); stroke: var(--bg); stroke-width: 2; }
+.chart .empty { fill: var(--muted); font-size: 13px; }
+.d-list { list-style: none; margin: 0; padding: 0; display: grid; gap: 6px; font-size: 14px; }
+.d-list li { display: flex; flex-wrap: wrap; gap: 4px 12px; padding: 8px 10px; border-radius: 8px; background: var(--bg); }
+.d-list time { font-family: var(--f-mono); color: var(--muted); }
+.d-list .ex { font-size: 11px; font-weight: 700; color: var(--muted); border: 1px solid var(--line); border-radius: 99px; padding: 0 6px; }
+
 /* ЛФК */
 .conds-field { flex-basis: 100%; padding-top: 16px; border-top: 1px solid var(--line); }
 .tags { display: flex; flex-wrap: wrap; gap: 8px; }
@@ -316,6 +395,34 @@ footer { font-size: 13px; color: var(--muted); }
   </section>
   <section class="lfk-note" id="lfkNote" hidden></section>
 
+  <details class="group" id="group">
+    <summary>
+      <span style="display:grid;gap:4px"><span class="eyebrow">Для преподавателя</span><h2>Режим «Группа»</h2></span>
+      <span class="g-toggle" id="gToggle">Открыть</span>
+    </summary>
+    <div class="g-body">
+      <p class="muted">Добавь студентов и отметь у каждого заболевания. Сайт соберёт одну тренировку, безопасную для всей группы сразу, и покажет, кому что важно.</p>
+      <form class="g-form" id="gForm">
+        <div class="g-form-row">
+          <input type="text" id="gName" placeholder="Имя студента" maxlength="40" autocomplete="off" aria-label="Имя студента">
+          <button class="btn" type="submit">Добавить</button>
+        </div>
+        <div class="tags" id="gConds" aria-label="Заболевания студента"></div>
+      </form>
+      <ul class="g-list" id="gList"></ul>
+      <p class="g-empty" id="gEmpty">В группе пока никого нет. Добавь первого студента или заполни пример, чтобы посмотреть, как это работает.</p>
+      <div class="g-summary" id="gSummary" hidden></div>
+      <div class="g-actions">
+        <button class="btn" type="button" id="gApply" disabled>Собрать тренировку для группы</button>
+        <button class="btn ghost" type="button" id="gCopy" disabled>Скопировать план</button>
+        <button class="btn ghost" type="button" id="gSample">Пример группы</button>
+        <button class="btn ghost" type="button" id="gClear" disabled>Очистить группу</button>
+      </div>
+      <p class="g-status" id="gStatus" aria-live="polite"></p>
+      <p class="g-privacy">Список хранится только в этом браузере и никуда не отправляется.</p>
+    </div>
+  </details>
+
   <section class="board" aria-live="polite">
     <div class="board-top"><span id="roundLbl">Круг 1 из 2</span><span id="stationLbl">Станция 1 из 8</span><span id="leftLbl">Осталось 0:00</span></div>
     <div><span class="phase" id="phase">Готов к старту</span></div>
@@ -365,6 +472,82 @@ footer { font-size: 13px; color: var(--muted); }
       <button class="btn" id="coachSend" type="submit">Спросить</button>
     </form>
     <p class="coach-note" id="coachNote">Помощник отвечает по базе знаний сайта. Он не ставит диагноз и не заменяет врача.</p>
+  </section>
+
+  <section class="tool" id="testSec">
+    <div class="tool-head">
+      <span class="eyebrow">Самопроверка</span>
+      <div class="row"><h2>Тест физподготовки</h2>
+        <label class="muted" style="display:flex;gap:8px;align-items:center;font-size:14px">Нормы для <select class="t-sel" id="tSex" style="width:auto"><option value="m">юношей</option><option value="f">девушек</option></select></label></div>
+      <p class="muted">Пройди тесты — сайт оценит уровень и подберёт нагрузку. Любой тест можно пропустить.</p>
+    </div>
+    <div class="tests">
+      <div class="test">
+        <h3>Проба Руфье</h3>
+        <ol>
+          <li>Посиди 5 минут и посчитай пульс за 15 секунд — это P1.</li>
+          <li>Сделай 30 приседаний за 45 секунд (таймер подскажет темп).</li>
+          <li>Сразу посчитай пульс за 15 секунд — P2.</li>
+          <li>Отдохни и посчитай пульс в последние 15 секунд первой минуты — P3.</li>
+        </ol>
+        <div class="t-inputs">
+          <label for="tP1">P1<input id="tP1" type="number" min="5" max="60" inputmode="numeric"></label>
+          <label for="tP2">P2<input id="tP2" type="number" min="5" max="60" inputmode="numeric"></label>
+          <label for="tP3">P3<input id="tP3" type="number" min="5" max="60" inputmode="numeric"></label>
+        </div>
+        <button class="t-btn" type="button" id="tRufBtn">Таймер пробы</button>
+        <p class="t-timer" id="tRufTimer"></p>
+        <p class="warn">При проблемах с сердцем или коленями — только с разрешения врача.</p>
+      </div>
+      <div class="test">
+        <h3>Отжимания за минуту</h3>
+        <p class="muted" style="font-size:14px">Сколько раз получится за 60 секунд, тело прямое. Девушкам можно с колен.</p>
+        <div class="t-inputs"><label for="tPush">Раз<input id="tPush" type="number" min="0" max="150" inputmode="numeric"></label></div>
+        <button class="t-btn" type="button" data-minute="tPushTimer">Таймер 1 минута</button>
+        <p class="t-timer" id="tPushTimer"></p>
+      </div>
+      <div class="test">
+        <h3>Приседания за минуту</h3>
+        <p class="muted" style="font-size:14px">Бёдра до параллели с полом, пятки не отрываются.</p>
+        <div class="t-inputs"><label for="tSquat">Раз<input id="tSquat" type="number" min="0" max="150" inputmode="numeric"></label></div>
+        <button class="t-btn" type="button" data-minute="tSquatTimer">Таймер 1 минута</button>
+        <p class="t-timer" id="tSquatTimer"></p>
+      </div>
+      <div class="test">
+        <h3>Планка на локтях</h3>
+        <p class="muted" style="font-size:14px">Держи прямую линию, пока можешь сохранять технику.</p>
+        <div class="t-inputs"><label for="tPlank">Секунд<input id="tPlank" type="number" min="0" max="900" inputmode="numeric"></label></div>
+        <button class="t-btn" type="button" id="tPlankBtn">Секундомер</button>
+        <p class="t-timer" id="tPlankTimer"></p>
+      </div>
+    </div>
+    <div style="display:flex;flex-wrap:wrap;gap:8px"><button class="btn" type="button" id="tEval">Оценить результат</button></div>
+    <div class="t-result" id="tResult" hidden></div>
+  </section>
+
+  <section class="tool" id="diarySec">
+    <div class="tool-head">
+      <span class="eyebrow">Дневник</span>
+      <h2>Дневник и прогресс</h2>
+      <p class="muted">Каждая завершённая тренировка и каждый тест записываются сюда автоматически.</p>
+    </div>
+    <div class="tiles">
+      <div class="tile"><b id="dCount">0</b><span>тренировок всего</span></div>
+      <div class="tile"><b id="dMin">0</b><span>минут всего</span></div>
+      <div class="tile"><b id="dWeek">0</b><span>тренировок за 7 дней</span></div>
+      <div class="tile"><b id="dBorg">—</b><span>средний Борг (последние 5)</span></div>
+    </div>
+    <div class="charts">
+      <div class="chart"><h3>Минуты тренировок по неделям</h3><span class="sub">Последние 8 недель</span><svg id="chWeeks" viewBox="0 0 520 220" role="img" aria-label="Минуты тренировок по неделям"></svg></div>
+      <div class="chart"><h3>Индекс Руфье</h3><span class="sub">Чем ниже, тем лучше сердце восстанавливается после нагрузки</span><svg id="chRuf" viewBox="0 0 520 220" role="img" aria-label="Индекс Руфье по тестам"></svg></div>
+    </div>
+    <h3>Последние записи</h3>
+    <ul class="d-list" id="dList"></ul>
+    <div style="display:flex;flex-wrap:wrap;gap:8px">
+      <button class="btn ghost" type="button" id="dSample">Показать пример</button>
+      <button class="btn ghost" type="button" id="dClear">Очистить дневник</button>
+    </div>
+    <p class="g-privacy">Дневник хранится только в этом браузере и никуда не отправляется.</p>
   </section>
 
   <section class="notes">
@@ -845,7 +1028,7 @@ const shuffle = a => { for (let i = a.length - 1; i > 0; i--) { const j = Math.f
 let plan = [];   // chosen exercises
 let steps = [];  // timeline
 let idx = 0, remaining = 0, running = false, endAt = 0, timer = null, soundOn = true, actx = null;
-let liveMode = false, voiceOn = !!window.speechSynthesis, ratings = {}, borgMsgs = {}, manualAsk = false, showBorgFor = null;
+let students = loadGroup(), groupActive = false, liveMode = false, voiceOn = !!window.speechSynthesis, ratings = {}, borgMsgs = {}, manualAsk = false, showBorgFor = null;
 
 // Voice coach: browser speech synthesis, Russian voice if the device has one
 function say(text, onstart) {
@@ -909,6 +1092,7 @@ function rate(v) {
     msg = "Слишком тяжело. Остановись, спокойно походи и восстанови дыхание. Если есть боль или головокружение, скажи преподавателю.";
   }
   borgMsgs[r] = msg;
+  updateTrainingBorg();
   manualAsk = false;
   showBorgFor = r;
   say(msg);
@@ -973,7 +1157,7 @@ function build() {
       <div class="station-top"><span class="num">${String(i + 1).padStart(2, "0")}</span><span class="chip ${e.g}">${GROUP[e.g]}</span></div>
       <div class="fig" data-ex="${e.n}"></div>
       <h3>${e.n}</h3>
-      ${h.length ? `<span class="good">Полезно: ${h.join(", ")}</span>` : ""}
+      ${h.length ? `<span class="good">Полезно: ${helpsLabel(e, conds, h)}</span>` : ""}
       <p>${e.t}</p>
       <div class="card-actions"><button class="swap zoom" data-z="${i}">Смотреть крупно</button><button class="swap speak" data-s="${i}">Озвучить</button><button class="swap" data-i="${i}">Заменить упражнение</button></div>
     </li>`).join("");
@@ -992,7 +1176,7 @@ function renderNote(conds, avoid, L) {
   if (!conds.length) return;
   const short = plan.length < val("cnt") ? `<p class="warn">Подходящих упражнений хватило только на ${plan.length} ${plural(plan.length, "станцию", "станции", "станций")}.</p>` : "";
   box.innerHTML = `
-    <div class="lfk-head"><span class="eyebrow">Режим ЛФК</span><span class="muted">Работа ${L.work} с · отдых ${L.rest} с</span></div>
+    <div class="lfk-head"><span class="eyebrow">${groupActive ? `Тренировка для группы · ${students.length} ${plural(students.length, "студент", "студента", "студентов")}` : "Режим ЛФК"}</span><span class="muted">Работа ${L.work} с · отдых ${L.rest} с</span></div>
     <ul>${conds.map(c => `<li><b>${CONDS[c].name}.</b> ${CONDS[c].why}</li>`).join("")}</ul>
     ${short}
     <details><summary>Убрано из тренировки: ${avoid.size} ${plural(avoid.size, "упражнение", "упражнения", "упражнений")}</summary><p>${[...avoid].join(", ")}</p></details>
@@ -1064,7 +1248,7 @@ function next() {
     beep(523, 0.4);
     say(s.roundBreak ? `Круг ${s.round} завершён. Отдых минута. Оцени, насколько было тяжело. Первое упражнение нового круга: ${plan[s.ex].n}.` : `Отдых. Дальше: ${techText(plan[s.ex])}`);
   }
-  else if (t === "done") { beep(784, 0.2); setTimeout(() => beep(1046, 0.5), 220); stop(); say("Тренировка завершена. Молодец! Оцени последний круг, а потом сделай заминку и растяжку."); }
+  else if (t === "done") { beep(784, 0.2); setTimeout(() => beep(1046, 0.5), 220); stop(); logTraining(); say("Тренировка завершена. Молодец! Оцени последний круг, а потом сделай заминку и растяжку."); }
   if (running) endAt = Date.now() + remaining * 1000;
 }
 
@@ -1204,7 +1388,306 @@ function zones() {
 }
 $("age").addEventListener("input", zones);
 $("conds").innerHTML = Object.entries(CONDS).map(([k, c]) => `<input type="checkbox" id="c-${k}" value="${k}"><label for="c-${k}">${c.name}</label>`).join("");
-$("conds").addEventListener("change", () => { generate(); zones(); });
+$("conds").addEventListener("change", () => { groupActive = false; generate(); zones(); renderGroup(); });
+
+// --- Group mode: one training that is safe for every student in the group ---
+const esc = t => String(t).replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+const COND_NOTE = {
+  posture: "следить за ровной спиной, без скручиваний",
+  flat: "без прыжков, обувь с супинатором",
+  myopia: "без резких наклонов и натуживания",
+  asthma: "ингалятор рядом, при одышке — остановиться",
+  heart: "пульс не выше 70% от максимума, не задерживать дыхание",
+  weight: "без прыжков, следить за коленями",
+  knees: "без глубоких приседаний и выпадов",
+};
+function loadGroup() { try { const v = JSON.parse(localStorage.getItem("krug-group") || "[]"); return Array.isArray(v) ? v.filter(x => x && typeof x.name === "string" && Array.isArray(x.conds)).map(x => ({ name: x.name.slice(0, 40), conds: x.conds.filter(c => CONDS[c]) })) : []; } catch (_) { return []; } }
+function saveGroup() { try { localStorage.setItem("krug-group", JSON.stringify(students)); } catch (_) {} }
+function groupConds() { return Object.keys(CONDS).filter(c => students.some(st => st.conds.includes(c))); }
+function helpsLabel(e, conds, h) {
+  if (!groupActive) return h.join(", ");
+  const names = students.filter(st => st.conds.some(c => CONDS[c].add.includes(e.n) || CONDS[c].good.includes(e.n))).map(st => st.name);
+  return names.length ? esc(names.join(", ")) : h.join(", ");
+}
+function renderGroup() {
+  $("gList").innerHTML = students.map((st, i) => `<li class="g-item"><b>${esc(st.name)}</b><button class="g-del" type="button" data-del="${i}" aria-label="Удалить ${esc(st.name)}">×</button><div class="g-conds">${st.conds.length ? st.conds.map(c => `<span class="g-tag">${CONDS[c].name}</span>`).join("") : '<span class="g-tag none">без ограничений</span>'}</div></li>`).join("");
+  const has = students.length > 0;
+  $("gEmpty").hidden = has;
+  $("gApply").disabled = $("gClear").disabled = !has;
+  $("gCopy").disabled = !(has && groupActive);
+  $("gToggle").textContent = has ? `${students.length} ${plural(students.length, "студент", "студента", "студентов")}` : "Открыть";
+  const box = $("gSummary");
+  box.hidden = !has;
+  if (!has) return;
+  const gc = groupConds();
+  const gentle = gc.some(c => CONDS[c].gentle);
+  box.innerHTML = `
+    <b>Сводка по группе</b>
+    <ul>${gc.length ? gc.map(c => { const who = students.filter(st => st.conds.includes(c)).map(st => st.name); return `<li>${CONDS[c].name} — ${who.length}: ${esc(who.join(", "))}</li>`; }).join("") : "<li>Ограничений нет — подойдёт обычная тренировка.</li>"}</ul>
+    ${gc.length ? `<span class="muted">Из тренировки будет убрано ${new Set(gc.flatMap(c => CONDS[c].avoid)).size} упражнений, добавлены лечебные.${gentle ? " Нагрузка щадящая: в группе есть студенты с астмой или проблемами с сердцем." : ""}</span>` : ""}
+    ${students.some(st => st.conds.length) ? `<b>Индивидуально</b><ul>${students.filter(st => st.conds.length).map(st => `<li>${esc(st.name)}: ${st.conds.map(c => COND_NOTE[c]).join("; ")}</li>`).join("")}</ul>` : ""}`;
+}
+function applyGroup() {
+  const gc = groupConds();
+  document.querySelectorAll("#conds input").forEach(i => { i.checked = gc.includes(i.value); });
+  groupActive = true;
+  generate(); zones(); renderGroup();
+  $("gStatus").textContent = `Готово: тренировка собрана для ${students.length} ${plural(students.length, "студента", "студентов", "студентов")}.`;
+  document.querySelector(".board").scrollIntoView({ behavior: REDUCED ? "auto" : "smooth", block: "start" });
+}
+function planText() {
+  const work = steps.find(x => x.type === "work"), rest = steps.find(x => x.type === "rest" && !x.roundBreak);
+  const gc = groupConds();
+  return [
+    `Круговая тренировка для группы (${students.length} чел.)`,
+    `Режим: работа ${work ? work.dur : 0} с, отдых ${rest ? rest.dur : 0} с, кругов: ${val("rnd")}, ≈ ${Math.round(steps.reduce((t, x) => t + x.dur, 0) / 60)} мин.`,
+    gc.length ? `Учтены: ${gc.map(c => `${CONDS[c].name} (${students.filter(st => st.conds.includes(c)).map(st => st.name).join(", ")})`).join("; ")}.` : "Ограничений нет.",
+    "",
+    "Станции:",
+    ...plan.map((e, i) => `${i + 1}. ${e.n} — ${e.t}`),
+    "",
+    ...(students.some(st => st.conds.length) ? ["Индивидуально:", ...students.filter(st => st.conds.length).map(st => `— ${st.name}: ${st.conds.map(c => COND_NOTE[c]).join("; ")}`), ""] : []),
+    "Перед тренировкой — разминка 5 минут, после — заминка и растяжка. При боли, головокружении или одышке — сразу остановиться.",
+  ].join("\n");
+}
+$("gConds").innerHTML = Object.entries(CONDS).map(([k, c]) => `<input type="checkbox" id="g-${k}" value="${k}"><label for="g-${k}">${c.name}</label>`).join("");
+$("gForm").addEventListener("submit", e => {
+  e.preventDefault();
+  const name = $("gName").value.trim();
+  if (!name) { $("gStatus").textContent = "Впиши имя студента."; $("gName").focus(); return; }
+  const conds = [...document.querySelectorAll("#gConds input:checked")].map(i => i.value);
+  students.push({ name, conds });
+  saveGroup();
+  $("gName").value = "";
+  document.querySelectorAll("#gConds input").forEach(i => { i.checked = false; });
+  $("gStatus").textContent = `Добавлен: ${name}.`;
+  if (groupActive) groupActive = false;
+  renderGroup();
+  $("gName").focus();
+});
+$("gList").addEventListener("click", e => {
+  const b = e.target.closest(".g-del");
+  if (!b) return;
+  const [gone] = students.splice(+b.dataset.del, 1);
+  saveGroup();
+  if (groupActive) groupActive = false;
+  $("gStatus").textContent = gone ? `Удалён: ${gone.name}.` : "";
+  renderGroup();
+});
+$("gApply").onclick = applyGroup;
+$("gSample").onclick = () => {
+  students = [
+    { name: "Пример: Аня", conds: ["flat"] },
+    { name: "Пример: Илья", conds: ["asthma"] },
+    { name: "Пример: Марина", conds: ["posture", "myopia"] },
+    { name: "Пример: Олег", conds: ["knees"] },
+    { name: "Пример: Саша", conds: [] },
+  ];
+  saveGroup(); groupActive = false; renderGroup();
+  $("gStatus").textContent = "Заполнен пример группы. Нажми «Собрать тренировку для группы».";
+};
+let clearArmed = false;
+$("gClear").onclick = () => {
+  if (!clearArmed) { clearArmed = true; $("gClear").textContent = "Точно очистить?"; setTimeout(() => { clearArmed = false; $("gClear").textContent = "Очистить группу"; }, 4000); return; }
+  clearArmed = false; $("gClear").textContent = "Очистить группу";
+  students = []; saveGroup(); groupActive = false;
+  document.querySelectorAll("#conds input").forEach(i => { i.checked = false; });
+  generate(); zones(); renderGroup();
+  $("gStatus").textContent = "Группа очищена.";
+};
+$("gCopy").onclick = async () => {
+  const text = planText();
+  try { await navigator.clipboard.writeText(text); $("gStatus").textContent = "План скопирован — можно вставить в чат группы."; }
+  catch (_) {
+    const ta = document.createElement("textarea"); ta.value = text; ta.setAttribute("readonly", ""); ta.style.cssText = "position:fixed;left:-9999px";
+    document.body.append(ta); ta.select();
+    let ok = false; try { ok = document.execCommand("copy"); } catch (_) {}
+    ta.remove();
+    $("gStatus").textContent = ok ? "План скопирован — можно вставить в чат группы." : "Не получилось скопировать автоматически. Выдели план вручную в блоке «Станции».";
+  }
+};
+renderGroup();
+
+// --- Fitness test: Ruffier index + three strength tests -> recommended level ---
+let tTimer = null, tTimerBtn = null;
+function stopTestTimer() {
+  clearInterval(tTimer); tTimer = null;
+  if (tTimerBtn) { tTimerBtn.classList.remove("on"); tTimerBtn.textContent = tTimerBtn.dataset.label; tTimerBtn = null; }
+}
+// a sequence of timed stages shown in `out`; optional metronome beep every `tick` seconds
+function runStages(btn, out, stages, done) {
+  if (tTimerBtn === btn) { stopTestTimer(); out.textContent = "Остановлено."; return; }
+  stopTestTimer();
+  tTimerBtn = btn; btn.dataset.label = btn.dataset.label || btn.textContent; btn.textContent = "Стоп"; btn.classList.add("on");
+  let i = -1, end = 0, nextTick = 0;
+  const begin = () => {
+    i++;
+    if (i >= stages.length) { stopTestTimer(); beep(784, 0.2); setTimeout(() => beep(1046, 0.4), 220); out.textContent = done; say(done); return; }
+    end = Date.now() + stages[i].sec * 1000; nextTick = Date.now();
+    beep(1046, 0.3); say(stages[i].label);
+  };
+  begin();
+  tTimer = setInterval(() => {
+    const st = stages[i], left = Math.max(0, Math.ceil((end - Date.now()) / 1000));
+    out.textContent = `${st.label} — ${left} с`;
+    if (st.tick && Date.now() >= nextTick) { beep(520, 0.06); nextTick += st.tick * 1000; }
+    if (left <= 0) begin();
+  }, 100);
+}
+$("tRufBtn").onclick = e => runStages(e.currentTarget, $("tRufTimer"), [
+  { label: "Приседания: 30 раз, по сигналу", sec: 45, tick: 1.5 },
+  { label: "Считай пульс — это P2", sec: 15 },
+  { label: "Отдыхай", sec: 30 },
+  { label: "Считай пульс — это P3", sec: 15 },
+], "Готово! Впиши P2 и P3.");
+document.querySelectorAll("[data-minute]").forEach(b => { b.onclick = e => runStages(e.currentTarget, $(b.dataset.minute), [{ label: "Работа — считай повторения", sec: 60 }], "Время! Впиши, сколько получилось."); });
+let plankStart = 0;
+$("tPlankBtn").onclick = e => {
+  const b = e.currentTarget;
+  if (tTimerBtn === b) { const sec = Math.round((Date.now() - plankStart) / 1000); stopTestTimer(); $("tPlank").value = sec; $("tPlankTimer").textContent = `Записано: ${sec} с`; return; }
+  stopTestTimer();
+  tTimerBtn = b; b.dataset.label = b.dataset.label || b.textContent; b.textContent = "Стоп"; b.classList.add("on");
+  plankStart = Date.now(); beep(1046, 0.3); say("Планка. Держи.");
+  tTimer = setInterval(() => { $("tPlankTimer").textContent = `Держи: ${Math.floor((Date.now() - plankStart) / 1000)} с`; }, 200);
+};
+const num = id => { const v = $(id).value.trim(); return v === "" ? null : Math.max(0, +v); };
+function gradeOf(v, hi, mid, lowerBetter) { return lowerBetter ? (v <= hi ? 3 : v <= mid ? 2 : 1) : (v >= hi ? 3 : v >= mid ? 2 : 1); }
+const GRADE_TXT = { 3: "высокий", 2: "средний", 1: "низкий" };
+let lastTest = null;
+function evaluateTest() {
+  const f = $("tSex").value === "f";
+  const P1 = num("tP1"), P2 = num("tP2"), P3 = num("tP3");
+  const rows = [];
+  let ruffier = null;
+  if (P1 != null && P2 != null && P3 != null && P1 > 0) {
+    ruffier = Math.round((4 * (P1 + P2 + P3) - 200)) / 10;
+    const g = gradeOf(ruffier, 5, 10, true);
+    const txt = ruffier <= 0 ? "отлично" : ruffier <= 5 ? "хорошо" : ruffier <= 10 ? "удовлетворительно" : ruffier <= 15 ? "слабо" : "плохо";
+    rows.push(["Индекс Руфье", ruffier.toFixed(1), g, txt]);
+  }
+  const push = num("tPush"), squat = num("tSquat"), plank = num("tPlank");
+  if (push != null) { const g = f ? gradeOf(push, 20, 8) : gradeOf(push, 30, 15); rows.push(["Отжимания за минуту", push, g, GRADE_TXT[g]]); }
+  if (squat != null) { const g = f ? gradeOf(squat, 40, 25) : gradeOf(squat, 45, 30); rows.push(["Приседания за минуту", squat, g, GRADE_TXT[g]]); }
+  if (plank != null) { const g = gradeOf(plank, 90, 45); rows.push(["Планка, секунд", plank, g, GRADE_TXT[g]]); }
+  const box = $("tResult");
+  box.hidden = false;
+  if (!rows.length) { box.innerHTML = '<p class="t-verdict">Заполни хотя бы один тест: для пробы Руфье нужны все три пульса.</p>'; return; }
+  const avg = rows.reduce((t, r) => t + r[2], 0) / rows.length;
+  let lvl = avg >= 2.5 ? 2 : avg >= 1.7 ? 1 : 0;
+  const gentle = selectedConds().some(c => CONDS[c].gentle);
+  const capped = gentle && lvl > 1;
+  if (capped) lvl = 1;
+  lastTest = { t: Date.now(), ruffier, push, squat, plank, level: lvl };
+  box.innerHTML = `
+    <table class="t-table">${rows.map(r => `<tr><td>${r[0]}</td><td>${r[1]}</td><td><span class="grade g${r[2]}">${r[3]}</span></td></tr>`).join("")}</table>
+    <p class="t-verdict">Рекомендуемый уровень: <b>${LEVELS[lvl].name}</b> (работа ${LEVELS[lvl].work} с, отдых ${LEVELS[lvl].rest} с).${capped ? " Уровень ограничен из-за выбранного заболевания." : ""}</p>
+    <p class="muted" style="font-size:13px">Нормы ориентировочные, для студентов 17–25 лет. Индекс Руфье: до 5 — хорошо, 5–10 — удовлетворительно, выше 10 — стоит снизить нагрузку и показаться врачу.</p>
+    <div style="display:flex;flex-wrap:wrap;gap:8px"><button class="btn" type="button" id="tApply">Применить уровень и сохранить в дневник</button></div>`;
+  $("tApply").onclick = () => {
+    const r = document.querySelector(`input[name=lvl][value="${lvl}"]`); if (r) r.checked = true;
+    build();
+    addTest(lastTest);
+    $("tApply").disabled = true; $("tApply").textContent = "Сохранено, уровень применён";
+  };
+}
+$("tEval").onclick = evaluateTest;
+
+// --- Diary: trainings and tests kept in this browser; weekly minutes + Ruffier charts ---
+function loadLog() {
+  try { const v = JSON.parse(localStorage.getItem("krug-log") || "{}"); return { trainings: Array.isArray(v.trainings) ? v.trainings : [], tests: Array.isArray(v.tests) ? v.tests : [] }; }
+  catch (_) { return { trainings: [], tests: [] }; }
+}
+let diary = loadLog(), sessionId = null;
+function saveLog() { try { localStorage.setItem("krug-log", JSON.stringify(diary)); } catch (_) {} }
+function logTraining() {
+  const total = Math.round(steps.reduce((t, x) => t + x.dur, 0) / 60);
+  sessionId = Date.now();
+  diary.trainings.push({ t: sessionId, min: total, st: plan.length, rnd: val("rnd"), lvl: +val("lvl"), conds: selectedConds(), borg: null });
+  saveLog(); renderDiary();
+}
+function updateTrainingBorg() {
+  if (!sessionId) return;
+  const rec = diary.trainings.find(x => x.t === sessionId);
+  const vals = Object.values(ratings);
+  if (rec && vals.length) { rec.borg = Math.round(vals.reduce((a, b) => a + b, 0) / vals.length * 10) / 10; saveLog(); renderDiary(); }
+}
+function addTest(t) { if (!t) return; diary.tests.push(t); saveLog(); renderDiary(); }
+const dfmt = t => { const d = new Date(t); return `${String(d.getDate()).padStart(2, "0")}.${String(d.getMonth() + 1).padStart(2, "0")}`; };
+const weekStart = t => { const d = new Date(t); d.setHours(0, 0, 0, 0); d.setDate(d.getDate() - ((d.getDay() + 6) % 7)); return d.getTime(); };
+const svgEl = (tag, a, txt) => `<${tag} ${Object.entries(a).map(([k, v]) => `${k}="${v}"`).join(" ")}>${txt ?? ""}</${tag}>`;
+const niceMax = v => { if (v <= 10) return 10; const p = Math.pow(10, Math.floor(Math.log10(v))); return Math.ceil(v / p) * p; };
+function chartWeeks() {
+  const W = 520, H = 220, L = 34, R = 10, T = 18, B = 28, now = weekStart(Date.now()), WK = 7 * 864e5;
+  const weeks = Array.from({ length: 8 }, (_, i) => ({ s: now - (7 - i) * WK, min: 0, n: 0 }));
+  diary.trainings.forEach(x => { const w = weeks.find(w => x.t >= w.s && x.t < w.s + WK); if (w) { w.min += x.min; w.n++; } });
+  if (!weeks.some(w => w.n)) return svgEl("text", { x: W / 2, y: H / 2, "text-anchor": "middle", class: "empty" }, "Пока нет тренировок — заверши первую, и здесь появится столбик");
+  const max = niceMax(Math.max(...weeks.map(w => w.min))), y = v => T + (H - T - B) * (1 - v / max), band = (W - L - R) / 8, bw = Math.min(34, band * 0.55);
+  let o = "";
+  [0, max / 2, max].forEach(v => { o += svgEl("line", { x1: L, x2: W - R, y1: y(v), y2: y(v), class: "grid-l" }); o += svgEl("text", { x: L - 6, y: y(v) + 4, "text-anchor": "end" }, Math.round(v)); });
+  weeks.forEach((w, i) => {
+    const cx = L + band * i + band / 2, top = y(w.min), h = H - B - top;
+    if (w.min > 0) {
+      const r = Math.min(4, h), x = cx - bw / 2;
+      o += `<path class="bar" d="M${x} ${H - B}V${top + r}Q${x} ${top} ${x + r} ${top}H${x + bw - r}Q${x + bw} ${top} ${x + bw} ${top + r}V${H - B}Z"><title>Неделя с ${dfmt(w.s)}: ${w.min} мин, ${w.n} ${plural(w.n, "тренировка", "тренировки", "тренировок")}</title></path>`;
+    }
+    o += svgEl("text", { x: cx, y: H - B + 16, "text-anchor": "middle" }, dfmt(w.s));
+  });
+  const last = weeks[7];
+  if (last.min) o += svgEl("text", { x: L + band * 7 + band / 2, y: y(last.min) - 6, "text-anchor": "middle", class: "val" }, last.min);
+  return o;
+}
+function chartRuf() {
+  const W = 520, H = 220, L = 34, R = 16, T = 18, B = 28;
+  const pts = diary.tests.filter(x => typeof x.ruffier === "number").sort((a, b) => a.t - b.t).slice(-10);
+  if (!pts.length) return svgEl("text", { x: W / 2, y: H / 2, "text-anchor": "middle", class: "empty" }, "Пройди пробу Руфье, и здесь появится график");
+  const max = Math.max(15, Math.ceil(Math.max(...pts.map(p => p.ruffier)) / 5) * 5), min = Math.min(0, Math.floor(Math.min(...pts.map(p => p.ruffier))));
+  const y = v => T + (H - T - B) * (max - v) / (max - min), x = i => pts.length === 1 ? (L + W - R) / 2 : L + 10 + (W - L - R - 20) * i / (pts.length - 1);
+  let o = "";
+  [min, max].forEach(v => { o += svgEl("line", { x1: L, x2: W - R, y1: y(v), y2: y(v), class: "grid-l" }); o += svgEl("text", { x: L - 6, y: y(v) + 4, "text-anchor": "end" }, v); });
+  [[5, "хорошо"], [10, "удовл."]].forEach(([v, t]) => { o += svgEl("line", { x1: L, x2: W - R, y1: y(v), y2: y(v), class: "ref-l" }); o += svgEl("text", { x: L - 6, y: y(v) + 4, "text-anchor": "end" }, v); o += svgEl("text", { x: W - R, y: y(v) - 4, "text-anchor": "end" }, `ниже — ${t}`); });
+  if (pts.length > 1) o += svgEl("path", { class: "ln", d: pts.map((p, i) => `${i ? "L" : "M"}${x(i)} ${y(p.ruffier)}`).join("") });
+  pts.forEach((p, i) => { o += `<circle class="pt" cx="${x(i)}" cy="${y(p.ruffier)}" r="5"><title>${dfmt(p.t)}: индекс ${p.ruffier.toFixed(1)}</title></circle>`; o += svgEl("text", { x: x(i), y: H - B + 16, "text-anchor": "middle" }, dfmt(p.t)); });
+  const lp = pts[pts.length - 1];
+  o += svgEl("text", { x: x(pts.length - 1), y: y(lp.ruffier) - 10, "text-anchor": "middle", class: "val" }, lp.ruffier.toFixed(1));
+  return o;
+}
+function renderDiary() {
+  const tr = diary.trainings;
+  $("dCount").textContent = tr.length;
+  $("dMin").textContent = tr.reduce((t, x) => t + (x.min || 0), 0);
+  $("dWeek").textContent = tr.filter(x => x.t > Date.now() - 7 * 864e5).length;
+  const b = tr.filter(x => typeof x.borg === "number").slice(-5);
+  $("dBorg").textContent = b.length ? (b.reduce((t, x) => t + x.borg, 0) / b.length).toFixed(1) : "—";
+  $("chWeeks").innerHTML = chartWeeks();
+  $("chRuf").innerHTML = chartRuf();
+  const items = [
+    ...tr.map(x => ({ t: x.t, ex: x.ex, txt: `Тренировка: ${x.min} мин, ${x.st} ${plural(x.st, "станция", "станции", "станций")} × ${x.rnd}, уровень «${LEVELS[x.lvl]?.name ?? "—"}»${x.conds?.length ? ", ЛФК" : ""}${typeof x.borg === "number" ? `, Борг ${x.borg}` : ""}` })),
+    ...diary.tests.map(x => ({ t: x.t, ex: x.ex, txt: `Тест: ${[x.ruffier != null ? `Руфье ${x.ruffier.toFixed(1)}` : "", x.push != null ? `отжимания ${x.push}` : "", x.squat != null ? `приседания ${x.squat}` : "", x.plank != null ? `планка ${x.plank} с` : ""].filter(Boolean).join(", ")}` })),
+  ].sort((a, c) => c.t - a.t).slice(0, 8);
+  $("dList").innerHTML = items.length ? items.map(i => `<li><time>${dfmt(i.t)}</time><span>${i.txt}</span>${i.ex ? '<span class="ex">пример</span>' : ""}</li>`).join("") : '<li class="muted">Записей пока нет. Заверши тренировку или пройди тест — запись появится здесь.</li>';
+  const hasEx = tr.some(x => x.ex) || diary.tests.some(x => x.ex);
+  $("dSample").textContent = hasEx ? "Убрать пример" : "Показать пример";
+}
+$("dSample").onclick = () => {
+  if (diary.trainings.some(x => x.ex) || diary.tests.some(x => x.ex)) {
+    diary.trainings = diary.trainings.filter(x => !x.ex); diary.tests = diary.tests.filter(x => !x.ex);
+  } else {
+    const D = 864e5, start = weekStart(Date.now()) - 7 * 7 * D;
+    for (let w = 0; w < 8; w++) [0, 2, 4].forEach((d, k) => {
+      const t = start + (w * 7 + d) * D + 18 * 3600e3;
+      if (t < Date.now() && !(w === 3 && k === 2)) diary.trainings.push({ t, min: 14 + Math.round(w * 0.8) + k, st: 8, rnd: w < 4 ? 2 : 3, lvl: w < 5 ? 1 : 2, conds: [], borg: Math.round((15 - w * 0.4 + (k === 1 ? 0.5 : 0)) * 10) / 10, ex: true });
+    });
+    [[0, 11.2], [3, 8.6], [6, 6.4]].forEach(([w, r]) => diary.tests.push({ t: start + w * 7 * D + 2 * D + 10 * 3600e3, ruffier: r, push: 18 + w * 2, squat: 32 + w * 2, plank: 50 + w * 8, level: w < 5 ? 1 : 2, ex: true }));
+  }
+  saveLog(); renderDiary();
+};
+let dClearArmed = false;
+$("dClear").onclick = () => {
+  if (!dClearArmed) { dClearArmed = true; $("dClear").textContent = "Точно очистить?"; setTimeout(() => { dClearArmed = false; $("dClear").textContent = "Очистить дневник"; }, 4000); return; }
+  dClearArmed = false; $("dClear").textContent = "Очистить дневник";
+  diary = { trainings: [], tests: [] }; saveLog(); renderDiary();
+};
+renderDiary();
 
 $("fEx").textContent = ALL.length;
 $("fLfk").textContent = EX_LFK.length;
