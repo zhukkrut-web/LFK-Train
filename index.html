@@ -146,6 +146,17 @@ header .lead { max-width: 62ch; color: var(--muted); font-size: 17px; }
 .viewer-info ol { margin: 0; padding-left: 1.3em; display: grid; gap: 8px; }
 .viewer-info .label { font-family: var(--f-mono); font-size: 12px; letter-spacing: .1em; text-transform: uppercase; color: var(--muted); }
 .viewer-info .warn-list { color: var(--muted); }
+.viewer-live { display: flex; flex-wrap: wrap; align-items: center; gap: 10px 20px; max-width: 1200px; width: 100%; margin: 0 auto; }
+.vphase { font-family: var(--f-display); font-weight: 700; font-size: 15px; padding: 6px 14px; border-radius: 999px; background: var(--line); color: var(--fg); }
+.vphase.work { background: var(--accent); color: var(--accent-ink); }
+.vphase.rest { background: var(--rest); color: #04160D; }
+.v-clock { font-family: var(--f-mono); font-weight: 700; font-size: clamp(40px, 8vw, 72px); line-height: 1; font-variant-numeric: tabular-nums; }
+.v-next { color: var(--muted); font-size: 16px; min-width: 0; }
+.v-bar { flex-basis: 100%; height: 8px; background: var(--line); border-radius: 99px; overflow: hidden; }
+.viewer .borg { background: var(--surface); border: 1px solid var(--line); max-width: 1200px; width: 100%; margin: 0 auto; }
+.viewer .borg-btn { color: var(--fg); border-color: var(--line); }
+.viewer .borg-btn:hover { border-color: var(--fg); }
+.v-bar > i { display: block; height: 100%; width: 0; background: var(--accent); transition: width .25s linear; }
 
 /* AI coach */
 .coach { display: grid; gap: 16px; background: var(--surface); border: 1px solid var(--line); border-radius: 16px; padding: 22px; }
@@ -438,14 +449,22 @@ footer { font-size: 13px; color: var(--muted); }
   </section>
 
   <footer>Упражнения без инвентаря. Время работы и отдыха подбирается по уровню: новичок 20/40 с, средний 30/30 с, продвинутый 40/20 с; между кругами отдых 60 с.</footer>
-  <div class="viewer" id="viewer" hidden role="dialog" aria-modal="true" aria-labelledby="vName">
+  <div class="viewer" id="viewer" hidden role="dialog" aria-modal="true" aria-labelledby="vName" style="grid-template-rows:auto auto auto 1fr">
     <div class="viewer-top">
       <h2 id="vName"></h2>
       <div class="viewer-actions">
+        <button class="btn" id="vPause" hidden>Пауза</button>
+        <button class="btn ghost" id="vSkip" hidden>Пропустить</button>
         <button class="btn ghost" id="vSpeak">Озвучить технику</button>
         <button class="btn ghost" id="vFull">Во весь экран</button>
         <button class="btn" id="vClose">Закрыть</button>
       </div>
+    </div>
+    <div class="viewer-live" id="vLive" hidden>
+      <span class="vphase" id="vPhase"></span>
+      <span class="v-clock" id="vClock">0:00</span>
+      <span class="v-next" id="vNext"></span>
+      <div class="v-bar"><i id="vBar"></i></div>
     </div>
     <div class="viewer-body">
       <div class="fig viewer-fig" id="vFig"></div>
@@ -826,7 +845,7 @@ const shuffle = a => { for (let i = a.length - 1; i > 0; i--) { const j = Math.f
 let plan = [];   // chosen exercises
 let steps = [];  // timeline
 let idx = 0, remaining = 0, running = false, endAt = 0, timer = null, soundOn = true, actx = null;
-let voiceOn = !!window.speechSynthesis, ratings = {}, borgMsgs = {}, manualAsk = false, showBorgFor = null;
+let liveMode = false, voiceOn = !!window.speechSynthesis, ratings = {}, borgMsgs = {}, manualAsk = false, showBorgFor = null;
 
 // Voice coach: browser speech synthesis, Russian voice if the device has one
 function say(text, onstart) {
@@ -1012,6 +1031,7 @@ function render() {
   document.querySelectorAll(".station").forEach((el, i) => el.classList.toggle("active", s.type !== "done" && i === s.ex));
   $("start").textContent = running ? "Пауза" : (idx === 0 && remaining === steps[0].dur ? "Старт" : s.type === "done" ? "Ещё раз" : "Продолжить");
   $("skip").disabled = s.type === "done";
+  if (typeof updateLive === "function") updateLive();
   const ar = askedRound() ?? showBorgFor, rated = ar != null && ratings[ar] != null;
   $("borg").hidden = ar == null;
   if (ar != null) {
@@ -1068,6 +1088,10 @@ function start() {
   timer = setInterval(tick, 200);
   beep(880, 0.1);
   if (fresh) say(`Приготовься. Первое упражнение: ${techText(plan[0])}`);
+  if (!liveMode) {
+    openViewer(plan[steps[idx].ex], true);
+    if (document.fullscreenEnabled && !document.fullscreenElement) $("viewer").requestFullscreen().catch(() => {});
+  }
   render();
 }
 function stop() { running = false; clearInterval(timer); timer = null; }
@@ -1103,24 +1127,55 @@ $("boardFig").addEventListener("click", () => { const s = steps[idx]; if (s && s
 
 // Full-screen viewer: big figure, big cues, technique, mistakes
 // cue i is shown while moving INTO pose i, so the movement starts with cue 1
-const phases = e => { const c = CUES[e.n] || []; return uniqSeq(c.slice(1).concat(c.slice(0, 1))); };
+const phases = e => { const c = CUES[e.n] || [], p = uniqSeq(c.slice(1).concat(c.slice(0, 1))); if (p.length > 2 && p[0] === p[p.length - 1]) p.pop(); return p; };
 const techText = e => `${e.n}. ${e.t} ${phases(e).length ? phases(e).join(". ") + "." : ""}`;
 function speakTech(e) { if (!voiceOn) { voiceOn = true; $("voice").textContent = "Голос: вкл"; $("voice").setAttribute("aria-pressed", true); } say(techText(e)); }
 let viewerEx = null, viewerReturn = null;
-function openViewer(e) {
-  if (!e) return;
-  viewerEx = e; viewerReturn = document.activeElement;
+function fillViewer(e) {
+  viewerEx = e;
   $("vName").textContent = e.n;
   $("vTip").textContent = e.t;
   $("vSteps").innerHTML = phases(e).map(c => `<li>${c}</li>`).join("");
-  $("vMist").textContent = GROUP_MISTAKES[e.g] ? GROUP_MISTAKES[e.g][0].toUpperCase() + GROUP_MISTAKES[e.g].slice(1) + "." : "";
+  const m = mistakesOf(e); $("vMist").textContent = m ? m[0].toUpperCase() + m.slice(1) + "." : "";
+  makeFig($("vFig"), e.n);
+}
+function openViewer(e, live = false) {
+  if (!e) return;
+  liveMode = live;
+  if ($("viewer").hidden) viewerReturn = document.activeElement;
+  fillViewer(e);
+  $("vLive").hidden = $("vPause").hidden = $("vSkip").hidden = !live;
   $("viewer").hidden = false;
   document.body.style.overflow = "hidden";
-  makeFig($("vFig"), e.n);
-  $("vClose").focus();
+  if (live) updateLive(); else $("vClose").focus();
+}
+// Training mode: the viewer follows the timer — current exercise while working, the next one while resting
+function updateLive() {
+  if (!liveMode || $("viewer").hidden) return;
+  // the Borg question lives in the viewer during training mode
+  if ($("borg").parentElement !== $("viewer")) $("vLive").after($("borg"));
+  const s = steps[idx], e = plan[s.ex];
+  if (s.type !== "done" && viewerEx !== e) fillViewer(e);
+  const ph = $("vPhase");
+  ph.className = "vphase" + (s.type === "work" ? " work" : s.type === "rest" ? " rest" : "");
+  ph.textContent = $("phase").textContent;
+  $("vClock").textContent = fmt(s.type === "done" ? 0 : remaining);
+  $("vBar").style.width = $("bar").style.width;
+  $("vPause").textContent = running ? "Пауза" : s.type === "done" ? "Ещё раз" : "Продолжить";
+  $("vSkip").disabled = s.type === "done";
+  if (s.type === "done") {
+    $("vName").textContent = "Тренировка завершена!";
+    $("vNext").textContent = "Заминка: спокойная ходьба и растяжка 3–5 минут. Оцени самочувствие на табло.";
+  } else {
+    $("vName").textContent = (s.type === "work" ? "" : s.type === "prep" ? "Приготовься: " : "Далее: ") + e.n;
+    const nxt = steps.slice(idx + 1).find(x => x.type === "work");
+    $("vNext").textContent = `Круг ${s.round + 1} из ${val("rnd")} · станция ${s.ex + 1} из ${plan.length}` + (s.type === "work" && nxt ? ` · следующее: ${plan[nxt.ex].n}` : "");
+  }
 }
 function closeViewer() {
   if ($("viewer").hidden) return;
+  liveMode = false;
+  if ($("borg").parentElement === $("viewer")) document.querySelector(".board .controls").before($("borg"));
   $("viewer").hidden = true;
   document.body.style.overflow = "";
   $("vFig")._fig = null; $("vFig").innerHTML = "";
@@ -1128,6 +1183,8 @@ function closeViewer() {
   viewerReturn?.focus?.();
 }
 $("vClose").onclick = closeViewer;
+$("vPause").onclick = () => $("start").click();
+$("vSkip").onclick = () => $("skip").click();
 $("vSpeak").onclick = () => viewerEx && speakTech(viewerEx);
 $("vFull").hidden = !document.fullscreenEnabled;
 $("vFull").onclick = () => { const v = $("viewer"); (document.fullscreenElement ? document.exitFullscreen() : v.requestFullscreen()).catch(() => { $("vFull").hidden = true; }); };
@@ -1176,6 +1233,15 @@ const GROUP_MISTAKES = {
   breath: "на вдохе поднимаются плечи, выдох слишком короткий",
   eyes: "голова поворачивается вместе с глазами, долго не моргаешь",
 };
+const MISTAKES = {
+  "Круги руками": "руки опускаются ниже плеч, плечи поднимаются к ушам, круги слишком большие и быстрые",
+  "Подъём рук в стороны": "плечи поднимаются к ушам, руки поднимаются выше плеч, движение рывками",
+  "Плавание брассом лёжа": "голова запрокинута, ноги отрываются от пола, движение рывками",
+  "Супермен": "голова запрокинута назад, рывок вместо плавного подъёма, задержка дыхания",
+  "Ходьба на месте": "сутулая спина, шаркающий шаг, задержка дыхания",
+  "Боксёрский бой с тенью": "руки опускаются от подбородка, удар с замахом, ноги стоят на месте",
+};
+const mistakesOf = e => MISTAKES[e.n] || GROUP_MISTAKES[e.g] || "";
 const list = a => a.join(", ");
 const uniqSeq = a => a.filter((x, i) => x !== a[i - 1]);
 
@@ -1203,7 +1269,7 @@ function exerciseAnswer(e) {
     `«${e.n}» — группа «${GROUP[e.g]}».`,
     `Как делать: ${e.t}`,
     cues.length ? `По фазам: ${cues.join(" → ")}.` : "",
-    `Частые ошибки: ${GROUP_MISTAKES[e.g]}.`,
+    `Частые ошибки: ${mistakesOf(e)}.`,
     good.length ? `Полезно при: ${list(good)}.` : "",
     bad.length ? `Не рекомендуется при: ${list(bad)}.` : "",
     now.length ? `Сейчас это упражнение убрано из твоей тренировки из-за: ${list(now)}.` : "",
