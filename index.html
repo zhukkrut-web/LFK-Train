@@ -1,0 +1,1282 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<style>html{color-scheme:light dark}body{margin:0}img{max-width:100%}</style>
+<title>Круговая тренировка</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Unbounded:wght@500;700;800&family=Golos+Text:wght@400;500;600&family=JetBrains+Mono:wght@500;700&display=swap">
+<style>
+/* Layout: school-gym court — a scoreboard timer on top, the circuit as stations below, a coach's notes column at the end */
+:root {
+  --bg: #EDF1F6;
+  --surface: #FFFFFF;
+  --fg: #0F1C2E;
+  --muted: #5A6A80;
+  --line: #D3DCE7;
+  --accent: #E0452A;      /* court line orange-red */
+  --accent-ink: #FFFFFF;
+  --blue: #1F58C9;
+  --rest: #1C8A5A;
+  --board: #0F1C2E;       /* scoreboard */
+  --board-fg: #F3F6FA;
+  --chip-cardio: #FCE3DD; --chip-cardio-fg: #A42D17;
+  --chip-legs: #DDE7FB;   --chip-legs-fg: #1B4BA8;
+  --chip-arms: #E4F3EA;   --chip-arms-fg: #17714A;
+  --chip-core: #F3E6F8;   --chip-core-fg: #7A2F96;
+  --fig-shirt: #1F58C9; --fig-shorts: #24324A; --fig-skin: #E2A57A; --fig-shoe: #0F1C2E;
+  --f-display: "Unbounded", "Arial Black", system-ui, sans-serif;
+  --f-body: "Golos Text", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --f-mono: "JetBrains Mono", ui-monospace, Menlo, monospace;
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+  --bg: #0B121D; --surface: #131D2B; --fg: #E5ECF5; --muted: #93A3B8; --line: #24324A;
+  --accent: #FF6A4D; --accent-ink: #1A0A05; --blue: #6E9BFF; --rest: #3FCB8C;
+  --board: #050A12; --board-fg: #F3F6FA;
+  --chip-cardio: #3A1D17; --chip-cardio-fg: #FFAA97;
+  --chip-legs: #182844;   --chip-legs-fg: #A8C3FF;
+  --chip-arms: #15302A;   --chip-arms-fg: #8FE0B8;
+  --chip-core: #2E1D38;   --chip-core-fg: #E0B2F2;
+  --fig-shirt: #5B8BF0; --fig-shorts: #7F93B3; --fig-shoe: #E5ECF5;
+  color-scheme: dark;
+}}
+:root[data-theme="dark"] {
+  --bg: #0B121D; --surface: #131D2B; --fg: #E5ECF5; --muted: #93A3B8; --line: #24324A;
+  --accent: #FF6A4D; --accent-ink: #1A0A05; --blue: #6E9BFF; --rest: #3FCB8C;
+  --board: #050A12; --board-fg: #F3F6FA;
+  --chip-cardio: #3A1D17; --chip-cardio-fg: #FFAA97;
+  --chip-legs: #182844;   --chip-legs-fg: #A8C3FF;
+  --chip-arms: #15302A;   --chip-arms-fg: #8FE0B8;
+  --chip-core: #2E1D38;   --chip-core-fg: #E0B2F2;
+  --fig-shirt: #5B8BF0; --fig-shorts: #7F93B3; --fig-shoe: #E5ECF5;
+  color-scheme: dark;
+}
+* { box-sizing: border-box; }
+[hidden] { display: none !important; }
+body {
+  background: var(--bg); color: var(--fg);
+  font-family: var(--f-body); font-size: 16px; line-height: 1.5;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+  padding-block: 28px 56px;
+}
+.wrap { max-width: 1080px; margin: 0 auto; display: grid; gap: 28px; }
+h1, h2, h3 { font-family: var(--f-display); text-wrap: balance; margin: 0; line-height: 1.15; }
+h1 { font-size: clamp(30px, 6vw, 52px); font-weight: 800; letter-spacing: -0.02em; }
+h2 { font-size: 20px; font-weight: 700; }
+h3 { font-size: 15px; font-weight: 700; }
+p { margin: 0; }
+.eyebrow { font-family: var(--f-mono); font-size: 12px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--accent); font-weight: 700; }
+.muted { color: var(--muted); }
+
+header { display: grid; gap: 12px; }
+header .lead { max-width: 62ch; color: var(--muted); font-size: 17px; }
+
+/* settings */
+.settings { display: flex; flex-wrap: wrap; gap: 16px 24px; align-items: end; padding: 20px; background: var(--surface); border: 1px solid var(--line); border-radius: 14px; }
+.field { display: grid; gap: 6px; }
+.field > span { font-size: 12px; font-family: var(--f-mono); text-transform: uppercase; letter-spacing: 0.08em; color: var(--muted); }
+.seg { display: inline-flex; border: 1.5px solid var(--line); border-radius: 10px; overflow: hidden; flex-wrap: wrap; }
+.seg input { position: absolute; opacity: 0; pointer-events: none; }
+.seg label { padding: 8px 14px; cursor: pointer; font-weight: 500; font-size: 15px; border-right: 1.5px solid var(--line); user-select: none; }
+.seg label:last-of-type { border-right: 0; }
+.seg input:checked + label { background: var(--fg); color: var(--bg); }
+.seg input:focus-visible + label { outline: 2px solid var(--accent); outline-offset: -2px; }
+.range { width: 220px; max-width: 100%; accent-color: var(--accent); height: 38px; margin: 0; }
+.field output { color: var(--fg); font-weight: 700; font-variant-numeric: tabular-nums; }
+.btn { font: 600 15px var(--f-body); border: 0; border-radius: 10px; padding: 11px 18px; cursor: pointer; background: var(--accent); color: var(--accent-ink); }
+.btn.ghost { background: transparent; color: var(--fg); border: 1.5px solid var(--line); }
+.btn:focus-visible { outline: 3px solid var(--blue); outline-offset: 2px; }
+.btn:disabled { opacity: .45; cursor: default; }
+.summary { margin-left: auto; font-family: var(--f-mono); font-size: 14px; color: var(--muted); font-variant-numeric: tabular-nums; }
+
+/* scoreboard */
+.board { background: var(--board); color: var(--board-fg); border-radius: 18px; padding: 24px; display: grid; gap: 18px; position: relative; overflow: hidden; }
+.board::before { /* court centre circle */
+  content: ""; position: absolute; width: 360px; height: 360px; right: -120px; top: -140px;
+  border: 2px solid color-mix(in srgb, var(--board-fg) 10%, transparent); border-radius: 50%; pointer-events: none;
+}
+.board-top { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 8px; font-family: var(--f-mono); font-size: 13px; letter-spacing: .08em; text-transform: uppercase; opacity: .8; font-variant-numeric: tabular-nums; }
+.phase { display: inline-block; font-family: var(--f-display); font-weight: 700; font-size: 14px; letter-spacing: .06em; padding: 6px 12px; border-radius: 999px; background: color-mix(in srgb, var(--board-fg) 14%, transparent); }
+.phase.work { background: var(--accent); color: var(--accent-ink); }
+.phase.rest { background: var(--rest); color: #04160D; }
+.clock-row { display: flex; flex-wrap: wrap; align-items: center; gap: 12px 32px; }
+.clock { font-family: var(--f-mono); font-weight: 700; font-size: clamp(72px, 18vw, 148px); line-height: 1; font-variant-numeric: tabular-nums; letter-spacing: -0.03em; }
+.now { display: grid; gap: 6px; min-width: 0; flex: 1 1 260px; }
+.now .name { font-family: var(--f-display); font-size: clamp(22px, 4vw, 34px); font-weight: 700; line-height: 1.15; }
+.now .tip { opacity: .75; max-width: 48ch; }
+.now .next { font-size: 14px; opacity: .6; }
+.bar { height: 8px; background: color-mix(in srgb, var(--board-fg) 14%, transparent); border-radius: 99px; overflow: hidden; }
+.bar > i { display: block; height: 100%; width: 0; background: var(--accent); transition: width .25s linear; }
+.controls { display: flex; flex-wrap: wrap; gap: 10px; }
+.board .btn.ghost { color: var(--board-fg); border-color: color-mix(in srgb, var(--board-fg) 30%, transparent); }
+
+/* stations */
+.stations-head { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: baseline; gap: 8px; }
+.stations { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); gap: 12px; }
+.station { background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: 16px; display: grid; gap: 8px; align-content: start; transition: border-color .2s, transform .2s; }
+.station.active { border-color: var(--accent); box-shadow: 0 0 0 2px var(--accent); }
+.station-top { display: flex; justify-content: space-between; align-items: center; gap: 8px; }
+.num { font-family: var(--f-mono); font-weight: 700; font-size: 13px; color: var(--muted); font-variant-numeric: tabular-nums; }
+.chip { font-size: 12px; font-weight: 600; padding: 3px 9px; border-radius: 99px; }
+.chip.cardio { background: var(--chip-cardio); color: var(--chip-cardio-fg); }
+.chip.legs { background: var(--chip-legs); color: var(--chip-legs-fg); }
+.chip.arms { background: var(--chip-arms); color: var(--chip-arms-fg); }
+.chip.core { background: var(--chip-core); color: var(--chip-core-fg); }
+.station p { font-size: 14px; color: var(--muted); }
+.swap { justify-self: start; font: 500 13px var(--f-body); color: var(--blue); background: none; border: 0; padding: 0; cursor: pointer; }
+.swap:hover { text-decoration: underline; }
+.swap:focus-visible { outline: 2px solid var(--blue); outline-offset: 2px; }
+
+/* AI coach */
+.coach { display: grid; gap: 16px; background: var(--surface); border: 1px solid var(--line); border-radius: 16px; padding: 22px; }
+.coach-head { display: grid; gap: 6px; }
+.coach-chips { display: flex; flex-wrap: wrap; gap: 8px; }
+.coach-chips button { font: 500 14px var(--f-body); color: var(--blue); background: color-mix(in srgb, var(--blue) 10%, transparent); border: 0; border-radius: 999px; padding: 7px 13px; cursor: pointer; text-align: left; }
+.coach-chips button:hover { background: color-mix(in srgb, var(--blue) 18%, transparent); }
+.coach-chips button:disabled, .coach-form :disabled { opacity: .5; cursor: default; }
+.coach-log { display: grid; gap: 10px; }
+.coach-log:empty { display: none; }
+.msg { max-width: 75ch; padding: 12px 14px; border-radius: 12px; white-space: pre-wrap; line-height: 1.5; min-width: 0; overflow-wrap: anywhere; }
+.msg.user { justify-self: end; background: var(--fg); color: var(--bg); }
+.msg.bot { justify-self: start; background: var(--bg); border: 1px solid var(--line); }
+.msg.bot.thinking { color: var(--muted); font-style: italic; }
+.coach-form { display: flex; flex-wrap: wrap; gap: 8px; }
+.coach-form input { flex: 1 1 260px; min-width: 0; font: 16px var(--f-body); padding: 11px 14px; border-radius: 10px; border: 1.5px solid var(--line); background: var(--bg); color: var(--fg); }
+.coach-form input:focus-visible { outline: 2px solid var(--blue); outline-offset: 1px; }
+.coach-note { font-size: 13px; color: var(--muted); }
+
+/* Borg scale */
+.borg { display: grid; gap: 12px; padding: 16px; border-radius: 12px; background: color-mix(in srgb, var(--board-fg) 8%, transparent); }
+.borg-q { font-family: var(--f-display); font-weight: 700; font-size: 17px; }
+.borg-sub { font-family: var(--f-mono); font-weight: 500; font-size: 12px; opacity: .6; text-transform: uppercase; letter-spacing: .08em; margin-left: 6px; }
+.borg-scale { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 6px; }
+@media (max-width: 700px) { .borg-scale { grid-template-columns: repeat(4, minmax(0, 1fr)); } }
+.borg-btn { display: grid; gap: 2px; justify-items: center; padding: 10px 4px; border-radius: 10px; cursor: pointer; font: inherit; color: var(--board-fg); background: transparent; border: 1.5px solid color-mix(in srgb, var(--board-fg) 25%, transparent); }
+.borg-btn b { font-family: var(--f-mono); font-size: 22px; }
+.borg-btn span { font-size: 12px; opacity: .75; text-align: center; line-height: 1.2; }
+.borg-btn:nth-child(-n+2) b { color: #8FB8FF; }
+.borg-btn:nth-child(n+3):nth-child(-n+4) b { color: var(--rest); }
+.borg-btn:nth-child(5) b { color: #F2B84B; }
+.borg-btn:nth-child(n+6) b { color: var(--accent); }
+.borg-btn:hover { border-color: var(--board-fg); }
+.borg-btn:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.borg-msg { font-size: 16px; }
+.borg-log { font-family: var(--f-mono); font-size: 13px; opacity: .7; }
+.voice-status { font-size: 14px; color: #F2B84B; }
+.borg-table { display: grid; gap: 4px; font-size: 14px; }
+.borg-row { display: grid; grid-template-columns: 52px 1fr; gap: 10px; align-items: baseline; }
+.borg-row b { font-family: var(--f-mono); font-variant-numeric: tabular-nums; }
+.qr-box { display: flex; gap: 16px; align-items: center; background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: 14px; }
+.qr { width: 132px; height: 132px; flex: 0 0 auto; background: #FFFFFF; padding: 8px; border-radius: 8px; }
+.qr img, .qr canvas { width: 100% !important; height: 100% !important; display: block; }
+.qr-box p { font-size: 14px; color: var(--muted); min-width: 0; }
+
+/* ЛФК */
+.conds-field { flex-basis: 100%; padding-top: 16px; border-top: 1px solid var(--line); }
+.tags { display: flex; flex-wrap: wrap; gap: 8px; }
+.tags input { position: absolute; opacity: 0; pointer-events: none; }
+.tags label { padding: 7px 14px; border: 1.5px solid var(--line); border-radius: 999px; cursor: pointer; font-size: 15px; font-weight: 500; user-select: none; }
+.tags input:checked + label { background: var(--rest); border-color: var(--rest); color: var(--accent-ink); }
+.tags input:focus-visible + label { outline: 2px solid var(--blue); outline-offset: 2px; }
+.lfk-note { background: var(--surface); border: 1.5px solid var(--rest); border-radius: 14px; padding: 18px 20px; display: grid; gap: 10px; }
+.lfk-head { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 8px; align-items: baseline; }
+.lfk-note .eyebrow { color: var(--rest); }
+.lfk-note ul { margin: 0; padding-left: 1.2em; display: grid; gap: 6px; max-width: 80ch; }
+.lfk-note details summary { cursor: pointer; font-weight: 600; }
+.lfk-note details p { margin-top: 6px; color: var(--muted); font-size: 14px; }
+.lfk-note .warn { color: var(--accent); font-weight: 600; }
+.lfk-note .disclaimer { font-size: 13px; color: var(--muted); }
+.good { justify-self: start; font-size: 12px; font-weight: 600; color: var(--rest); }
+.station.helps { border-color: color-mix(in srgb, var(--rest) 55%, var(--line)); }
+.chip.breath, .chip.eyes { background: color-mix(in srgb, var(--rest) 18%, var(--surface)); color: var(--rest); }
+.fig .eye { fill: none; stroke: var(--fg); stroke-width: 5; }
+.fig .pupil { fill: var(--fg); }
+.board .fig .eye { stroke: var(--board-fg); }
+.board .fig .pupil { fill: var(--board-fg); }
+
+/* stick-figure demos */
+.fig { display: flex; flex-direction: column; gap: 4px; }
+.fig svg { display: block; width: 100%; flex: 1 1 auto; min-height: 0; }
+.fig line { stroke-linecap: round; }
+.fig .shirt { stroke: var(--fig-shirt); }
+.fig .shorts { stroke: var(--fig-shorts); }
+.fig .skin { stroke: var(--fig-skin); }
+.fig .shoe { stroke: var(--fig-shoe); }
+.fig .torso { stroke-width: 21; }
+.fig .ua { stroke-width: 10; }
+.fig .fa { stroke-width: 7.5; }
+.fig .th { stroke-width: 14; }
+.fig .sh { stroke-width: 10; }
+.fig .foot { stroke-width: 7; }
+.fig .neck { stroke-width: 8; }
+.fig .head, .fig .hand { fill: var(--fig-skin); }
+.fig .far { opacity: .55; }
+.fig .cue { margin: 0; min-height: 2.6em; font-size: 13px; font-weight: 600; line-height: 1.3; text-align: center; color: var(--accent); }
+.fig .ground { stroke: var(--line); stroke-width: 2; }
+.fig .prop { fill: var(--line); }
+.station .fig { height: 178px; background: var(--bg); border-radius: 8px; padding: 6px; }
+.board-fig { width: 180px; height: 200px; flex: 0 0 auto; }
+.board .fig { --fig-shorts: #7F93B3; --fig-shoe: #E5ECF5; --fig-shirt: #5B8BF0; }
+.board .fig .cue { color: #FF8A70; font-size: 14px; }
+.board .fig .far { opacity: .45; }
+.board .fig .head { fill: var(--fig-skin); }
+.board .fig .ground { stroke: color-mix(in srgb, var(--board-fg) 25%, transparent); }
+.board .fig .prop { fill: color-mix(in srgb, var(--board-fg) 22%, transparent); }
+
+/* notes */
+.notes { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 16px; }
+.note { background: var(--surface); border: 1px solid var(--line); border-radius: 14px; padding: 20px; display: grid; gap: 12px; align-content: start; min-width: 0; }
+.note ol, .note ul { margin: 0; padding-left: 1.2em; display: grid; gap: 6px; }
+.pulse { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
+.pulse input { font: 600 16px var(--f-mono); width: 5em; padding: 8px 10px; border: 1.5px solid var(--line); border-radius: 8px; background: var(--bg); color: var(--fg); }
+.pulse input:focus-visible { outline: 2px solid var(--accent); }
+.zones { display: grid; gap: 6px; font-size: 14px; }
+.zone { display: grid; grid-template-columns: 10px 1fr auto; gap: 10px; align-items: center; }
+.zone b { font-family: var(--f-mono); font-variant-numeric: tabular-nums; }
+.dot { width: 10px; height: 10px; border-radius: 50%; }
+.about { display: grid; gap: 20px; padding-top: 28px; border-top: 2px solid var(--line); }
+.about-head { display: grid; gap: 8px; }
+.about-head h2 { font-size: clamp(22px, 3.5vw, 30px); }
+.about-grid { display: grid; grid-template-columns: minmax(0, 3fr) minmax(0, 2fr); gap: 32px; }
+@media (max-width: 760px) { .about-grid { grid-template-columns: 1fr; } }
+.about-text, .about-side { display: grid; gap: 10px; align-content: start; min-width: 0; }
+.about-text p { max-width: 65ch; }
+.about-text h3:not(:first-child), .about-side h3:not(:first-child) { margin-top: 10px; }
+.about-side ol { margin: 0; padding-left: 1.3em; display: grid; gap: 6px; }
+.facts { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin: 0; }
+.facts div { background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 12px 14px; }
+.facts dt { font-family: var(--f-mono); font-weight: 700; font-size: 26px; color: var(--accent); font-variant-numeric: tabular-nums; }
+.facts dd { margin: 0; font-size: 14px; color: var(--muted); }
+footer { font-size: 13px; color: var(--muted); }
+@media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
+</style>
+</head>
+<body>
+
+<div class="wrap">
+  <header>
+    <span class="eyebrow">Физическая культура · проект</span>
+    <h1>Круговая тренировка</h1>
+    <p class="lead">Сайт собирает тренировку по станциям под уровень подготовки и ведёт её по таймеру: работа, отдых, следующее упражнение. Подходит для разминки на занятии и для тренировок дома без инвентаря.</p>  </header>
+
+  <section class="settings" aria-label="Настройки тренировки">
+    <div class="field"><span>Уровень</span>
+      <div class="seg" role="radiogroup">
+        <input type="radio" name="lvl" id="lvl0" value="0"><label for="lvl0">Новичок</label>
+        <input type="radio" name="lvl" id="lvl1" value="1" checked><label for="lvl1">Средний</label>
+        <input type="radio" name="lvl" id="lvl2" value="2"><label for="lvl2">Продвинутый</label>
+      </div>
+    </div>
+    <div class="field"><span>Станций: <output id="cntOut" for="cnt">8</output></span>
+      <input type="range" class="range" id="cnt" min="4" max="20" step="1" value="8" aria-label="Количество станций">
+    </div>
+    <div class="field"><span>Кругов</span>
+      <div class="seg" role="radiogroup">
+        <input type="radio" name="rnd" id="rnd2" value="2" checked><label for="rnd2">2</label>
+        <input type="radio" name="rnd" id="rnd3" value="3"><label for="rnd3">3</label>
+        <input type="radio" name="rnd" id="rnd4" value="4"><label for="rnd4">4</label>
+      </div>
+    </div>
+    <button class="btn" id="gen">Собрать заново</button>
+    <span class="summary" id="summary"></span>
+    <div class="field conds-field"><span>ЛФК: выбери заболевание (можно несколько)</span>
+      <div class="tags" id="conds"></div>
+    </div>
+  </section>
+  <section class="lfk-note" id="lfkNote" hidden></section>
+
+  <section class="board" aria-live="polite">
+    <div class="board-top"><span id="roundLbl">Круг 1 из 2</span><span id="stationLbl">Станция 1 из 8</span><span id="leftLbl">Осталось 0:00</span></div>
+    <div><span class="phase" id="phase">Готов к старту</span></div>
+    <div class="clock-row">
+      <div class="clock" id="clock">0:10</div>
+      <div class="fig board-fig" id="boardFig"></div>
+      <div class="now">
+        <div class="name" id="nowName">—</div>
+        <div class="tip" id="nowTip"></div>
+        <div class="next" id="nextLbl"></div>
+      </div>
+    </div>
+    <div class="bar"><i id="bar"></i></div>
+    <div class="borg" id="borg" hidden>
+      <p class="borg-q"><span id="borgTitle">Как тяжело было?</span> <span class="borg-sub">шкала Борга, 6–20</span></p>
+      <div class="borg-scale" id="borgScale"></div>
+      <p class="borg-msg" id="borgMsg" hidden></p>
+    </div>
+    <div class="controls">
+      <button class="btn" id="start">Старт</button>
+      <button class="btn ghost" id="skip">Пропустить</button>
+      <button class="btn ghost" id="reset">Сначала</button>
+      <button class="btn ghost" id="voice" aria-pressed="true">Голос: вкл</button>
+      <button class="btn ghost" id="voiceTest">Проверить голос</button>
+      <button class="btn ghost" id="sound" aria-pressed="true">Звук: вкл</button>
+      <button class="btn ghost" id="borgNow">Оценить самочувствие</button>
+    </div>
+    <p class="voice-status" id="voiceStatus" hidden></p>
+    <p class="borg-log" id="borgLog">После каждого круга здесь появится оценка самочувствия по шкале Борга. Можно оценить и в любой момент кнопкой «Оценить самочувствие».</p>
+  </section>
+
+  <section style="display:grid;gap:14px">
+    <div class="stations-head"><h2>Станции</h2><span class="muted" id="modeLbl"></span></div>
+    <ol class="stations" id="stations"></ol>
+  </section>
+
+  <section class="coach" id="coach">
+    <div class="coach-head">
+      <span class="eyebrow">Помощник</span>
+      <h2>Спроси помощника ЛФК</h2>
+      <p class="muted">Отвечает на вопросы про технику, замену упражнений, заболевания, дыхание, пульс и план занятий — с учётом твоей тренировки. Работает прямо в браузере, без входа и без интернета.</p>
+    </div>
+    <div class="coach-chips" id="coachChips"></div>
+    <div class="coach-log" id="coachLog" aria-live="polite"></div>
+    <form class="coach-form" id="coachForm">
+      <input id="coachInput" placeholder="Например: чем заменить приседания, если болит колено?" autocomplete="off" maxlength="500" aria-label="Вопрос тренеру">
+      <button class="btn" id="coachSend" type="submit">Спросить</button>
+    </form>
+    <p class="coach-note" id="coachNote">Помощник отвечает по базе знаний сайта. Он не ставит диагноз и не заменяет врача.</p>
+  </section>
+
+  <section class="notes">
+    <div class="note">
+      <span class="eyebrow">Как проводить</span>
+      <h3>Круговая тренировка на занятии</h3>
+      <ol>
+        <li>Разминка 5 минут: ходьба, вращения суставов, лёгкий бег на месте.</li>
+        <li>Участники делятся на команды по числу станций, каждая команда встаёт на свою.</li>
+        <li>По сигналу «Работа» все выполняют упражнение, по сигналу «Отдых» переходят на следующую станцию по часовой стрелке.</li>
+        <li>После последнего круга — заминка и растяжка 3–5 минут.</li>
+      </ol>
+    </div>
+    <div class="note">
+      <span class="eyebrow">Безопасность</span>
+      <h3>Правила на станциях</h3>
+      <ul>
+        <li>Техника важнее скорости: если устал, замедлись, но не ломай форму.</li>
+        <li>Спина ровная в приседаниях и планке, колени не выходят за носки.</li>
+        <li>Головокружение, боль в груди или суставах — сразу остановиться и сказать преподавателю.</li>
+        <li>Между станциями держать дистанцию не меньше 1,5 м.</li>
+        <li>Вода — в перерыве между кругами.</li>
+      </ul>
+    </div>
+    <div class="note">
+      <span class="eyebrow">Контроль нагрузки</span>
+      <h3>Пульсовые зоны</h3>
+      <div class="pulse"><label for="age">Возраст</label><input id="age" type="number" min="7" max="80" value="19"><span class="muted" id="hrmax"></span></div>
+      <div class="zones" id="zones"></div>
+      <p class="muted" style="font-size:13px">Пульс считают за 15 секунд на запястье или шее и умножают на 4. Максимум — по формуле 220 − возраст.</p>
+    </div>
+    <div class="note">
+      <span class="eyebrow">Самочувствие</span>
+      <h3>Шкала Борга (6–20)</h3>
+      <p class="muted" style="font-size:14px">Субъективная оценка нагрузки. После каждого круга сайт спрашивает, насколько было тяжело, и сам подстраивает нагрузку.</p>
+      <div class="borg-table">
+        <div class="borg-row"><b>6–9</b><span>Очень легко: можно петь</span></div>
+        <div class="borg-row"><b>10–11</b><span>Легко: свободно разговариваешь</span></div>
+        <div class="borg-row"><b>12–13</b><span>Умеренно: оптимально для ЛФК</span></div>
+        <div class="borg-row"><b>14–15</b><span>Тяжело: говорить трудно</span></div>
+        <div class="borg-row"><b>16–17</b><span>Очень тяжело: сайт снизит нагрузку</span></div>
+        <div class="borg-row"><b>18–20</b><span>Предельно: нужно остановиться</span></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="about" id="about">
+    <div class="about-head">
+      <span class="eyebrow">О проекте</span>
+      <h2>Тренировка, которая учитывает здоровье</h2>    </div>
+    <div class="about-grid">
+      <div class="about-text">
+        <h3>Актуальность</h3>
+        <p>Часть студентов занимается физкультурой в специальной медицинской группе (ЛФК): у них нарушения осанки, плоскостопие, близорукость, астма, проблемы с сердцем, давлением или суставами. Обычная тренировка им не подходит: одни упражнения противопоказаны, другие, наоборот, нужны. Преподавателю приходится подбирать нагрузку каждому вручную, а дома студент часто не знает, что ему можно.</p>
+        <h3>Цель</h3>
+        <p>Создать веб-сервис, который собирает безопасную круговую тренировку с учётом заболевания и показывает технику каждого упражнения.</p>
+        <h3>Практическая значимость</h3>
+        <p>Сервис можно использовать на занятиях ЛФК для разминки и круговой тренировки по станциям, а также для самостоятельных занятий дома. Он работает в браузере на телефоне и компьютере, его можно вывести на проектор в зале, устанавливать ничего не нужно.</p>
+        <h3>Ограничения</h3>
+        <p>Упражнения подобраны по общим принципам ЛФК. Сервис не заменяет назначение врача: индивидуальную программу определяют врач и преподаватель ЛФК.</p>
+      </div>
+      <div class="about-side">
+        <h3>Задачи</h3>
+        <ol>
+          <li>Собрать базу упражнений без инвентаря и разделить их по группам мышц.</li>
+          <li>Для заболеваний, частых в группах ЛФК, определить противопоказанные и рекомендуемые упражнения.</li>
+          <li>Сделать генератор тренировки с учётом уровня подготовки и заболевания.</li>
+          <li>Сделать таймер круговой тренировки со звуковыми сигналами.</li>
+          <li>Показать технику каждого упражнения анимацией.</li>
+          <li>Добавить контроль нагрузки по пульсу.</li>
+        </ol>
+        <h3>Результат</h3>
+        <dl class="facts">
+          <div><dt id="fEx">0</dt><dd>упражнений в базе</dd></div>
+          <div><dt id="fLfk">0</dt><dd>лечебных упражнений ЛФК</dd></div>
+          <div><dt id="fCond">0</dt><dd>заболеваний на выбор</dd></div>
+          <div><dt id="fAnim">0</dt><dd>анимаций техники</dd></div>
+        </dl>
+        <div class="qr-box"><div class="qr" id="qr" role="img" aria-label="QR-код со ссылкой на этот сайт"></div><p><b>Открыть на телефоне.</b> Наведи камеру на код, и сайт откроется сразу.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <footer>Упражнения без инвентаря. Время работы и отдыха подбирается по уровню: новичок 20/40 с, средний 30/30 с, продвинутый 40/20 с; между кругами отдых 60 с.</footer>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+<script>
+(() => {
+// The viewer can re-run this script when the page is updated; stop the previous copy first
+if (window.__krugCleanup) window.__krugCleanup();
+let cancelled = false;
+const EX = [
+  { n: "Прыжки «звёздочка»", g: "cardio", t: "Руки над головой, ноги в стороны, приземляйся мягко на носки." },
+  { n: "Бег на месте с высоким подниманием бедра", g: "cardio", t: "Колени до уровня пояса, работай руками." },
+  { n: "Бёрпи", g: "cardio", t: "Присед — упор лёжа — присед — прыжок вверх. Новичкам без отжимания." },
+  { n: "Скалолаз", g: "cardio", t: "Упор лёжа, поочерёдно подтягивай колени к груди, таз не поднимай." },
+  { n: "Прыжки через воображаемую скакалку", g: "cardio", t: "Небольшие прыжки на носках, вращай кистями." },
+  { n: "Приседания", g: "legs", t: "Ноги на ширине плеч, вес на пятках, бёдра до параллели с полом." },
+  { n: "Выпады назад", g: "legs", t: "Шаг назад, оба колена под 90°, корпус прямо. Ноги чередуй." },
+  { n: "Приседания с выпрыгиванием", g: "legs", t: "Из приседа резко вверх, приземление в присед." },
+  { n: "Стульчик у стены", g: "legs", t: "Спина прижата к стене, бёдра параллельно полу, держи позицию." },
+  { n: "Подъёмы на носки", g: "legs", t: "Медленно вверх, пауза, медленно вниз. Можно держаться за стену." },
+  { n: "Ягодичный мост", g: "legs", t: "Лёжа на спине, поднимай таз до прямой линии от плеч до колен." },
+  { n: "Отжимания", g: "arms", t: "Тело — прямая линия. Новичкам можно с колен." },
+  { n: "Обратные отжимания от скамейки", g: "arms", t: "Руки на опоре сзади, локти назад, опускайся до 90°." },
+  { n: "Планка с касанием плеч", g: "arms", t: "В упоре лёжа поочерёдно касайся рукой противоположного плеча, таз не раскачивай." },
+  { n: "Отжимания с широкой постановкой рук", g: "arms", t: "Ладони шире плеч, локти в стороны под 45°." },
+  { n: "Медведь (ходьба в упоре)", g: "arms", t: "Колени над полом, шагай вперёд и назад руками и ногами." },
+  { n: "Планка на локтях", g: "core", t: "Локти под плечами, живот втянут, не проваливай поясницу." },
+  { n: "Скручивания", g: "core", t: "Отрывай лопатки от пола, подбородок не прижимай к груди." },
+  { n: "Велосипед", g: "core", t: "Лёжа на спине тянись локтем к противоположному колену." },
+  { n: "Боковая планка", g: "core", t: "Половину времени на одном боку, половину на другом." },
+  { n: "Лодочка", g: "core", t: "Лёжа на животе подними прямые руки и ноги, держи." },
+  { n: "Подъёмы ног лёжа", g: "core", t: "Поясница прижата к полу, ноги опускай медленно." },
+  { n: "Боковые прыжки через линию", g: "cardio", t: "Прыгай вправо-влево через линию на полу, ноги вместе." },
+  { n: "Захлёст голени", g: "cardio", t: "Бег на месте, пятки касаются ягодиц." },
+  { n: "Конькобежец", g: "cardio", t: "Прыжок в сторону на одну ногу, вторую заводи назад." },
+  { n: "Боксёрский бой с тенью", g: "cardio", t: "Прямые удары руками в воздух, пружинь на ногах." },
+  { n: "Выпады вперёд", g: "legs", t: "Шаг вперёд, колено над стопой, заднее колено почти касается пола." },
+  { n: "Боковые выпады", g: "legs", t: "Шаг в сторону, садись на одну ногу, вторая прямая." },
+  { n: "Сумо-приседания", g: "legs", t: "Ноги широко, носки наружу, колени смотрят туда же, куда носки." },
+  { n: "Отжимания с узкой постановкой рук", g: "arms", t: "Ладони под грудью, локти вдоль корпуса. Можно с колен." },
+  { n: "Планка вверх-вниз", g: "arms", t: "Из планки на локтях в упор на руки и обратно, таз не качай." },
+  { n: "Круги руками", g: "arms", t: "Прямые руки в стороны, мелкие круги вперёд, потом назад." },
+  { n: "Супермен", g: "arms", t: "Лёжа на животе подними руки и грудь, сведи лопатки." },
+  { n: "Ножницы", g: "core", t: "Лёжа на спине, прямые ноги над полом скрещивай по очереди." },
+  { n: "Русские скручивания", g: "core", t: "Сидя, ноги согнуты, поворачивай корпус вправо-влево." },
+  { n: "Мёртвый жук", g: "core", t: "Лёжа на спине, опускай противоположные руку и ногу, поясница прижата." },
+];
+// Therapeutic (ЛФК) exercises appear only when a condition that needs them is selected
+const EX_LFK = [
+  { n: "Кошка-корова", g: "core", t: "На четвереньках: на выдохе округли спину вверх, на вдохе мягко прогнись. Медленно." },
+  { n: "Плавание брассом лёжа", g: "arms", t: "Лёжа на животе, руки и грудь чуть приподняты. Разводи руки через стороны назад, как в брассе." },
+  { n: "Стойка у стены", g: "core", t: "Затылок, лопатки, ягодицы и пятки касаются стены. Запомни это положение и дыши ровно." },
+  { n: "Ходьба на носках", g: "legs", t: "Поднимись на носки как можно выше и шагай на месте, не опускаясь на пятки." },
+  { n: "Ходьба на внешнем крае стопы", g: "legs", t: "Перенеси вес на наружные края стоп, пальцы слегка подожми. Шагай медленно." },
+  { n: "Катание мяча стопой", g: "legs", t: "Сидя на стуле, катай мячик или бутылку стопой вперёд-назад, от пальцев до пятки." },
+  { n: "Гимнастика для глаз", g: "eyes", t: "Не поворачивая головы, смотри влево, вправо, вверх и вниз. В конце поморгай 10 секунд." },
+  { n: "Дыхание: руки вверх — вдох, вниз — выдох", g: "breath", t: "Медленно подними руки через стороны — вдох носом. Опускай — длинный выдох ртом." },
+  { n: "Диафрагмальное дыхание", g: "breath", t: "Лёжа, ладонь на животе. Вдох носом — живот поднимается, выдох ртом в 2 раза длиннее." },
+  { n: "Ходьба на месте", g: "cardio", t: "Спокойный шаг на месте, руки работают свободно. Дыхание ровное, можно разговаривать." },
+  { n: "Подъём рук в стороны", g: "arms", t: "Медленно поднимай прямые руки до уровня плеч и опускай. Плечи к ушам не поднимай." },
+  { n: "Подъём прямой ноги лёжа", g: "legs", t: "Лёжа на спине, одна нога согнута. Прямую ногу поднимай до высоты колена другой ноги." },
+  { n: "Разгибание ноги сидя", g: "legs", t: "Сидя на стуле, медленно выпрями ногу в колене, задержись на 2 секунды, опусти." },
+];
+const ALL = EX.concat(EX_LFK);
+const JUMPS = ["Бёрпи", "Приседания с выпрыгиванием", "Боковые прыжки через линию", "Конькобежец", "Прыжки через воображаемую скакалку", "Прыжки «звёздочка»"];
+const CONDS = {
+  posture: { name: "Осанка, сколиоз",
+    avoid: ["Бёрпи", "Приседания с выпрыгиванием", "Боковые прыжки через линию", "Конькобежец", "Русские скручивания", "Велосипед", "Боковая планка"],
+    add: ["Кошка-корова", "Плавание брассом лёжа", "Стойка у стены"],
+    good: ["Супермен", "Лодочка", "Планка на локтях", "Мёртвый жук", "Ягодичный мост"],
+    why: "Убраны прыжки с ударом по позвоночнику, скручивания и несимметричные упражнения. Упор на мышцы спины, которые держат осанку." },
+  flat: { name: "Плоскостопие",
+    avoid: [...JUMPS, "Захлёст голени", "Бег на месте с высоким подниманием бедра"],
+    add: ["Ходьба на носках", "Ходьба на внешнем крае стопы", "Катание мяча стопой"],
+    good: ["Подъёмы на носки"],
+    why: "Убраны прыжки и бег: при приземлении стопа получает удар. Добавлены упражнения, которые укрепляют свод стопы." },
+  myopia: { name: "Близорукость",
+    avoid: ["Бёрпи", "Приседания с выпрыгиванием", "Боковые прыжки через линию", "Конькобежец", "Стульчик у стены", "Подъёмы ног лёжа", "Боковая планка"],
+    add: ["Гимнастика для глаз", "Дыхание: руки вверх — вдох, вниз — выдох"],
+    good: [],
+    why: "Убраны прыжки, сотрясения и сильное натуживание: они повышают нагрузку на глаза. Добавлена гимнастика для глаз." },
+  asthma: { name: "Астма", gentle: true,
+    avoid: ["Бёрпи", "Скалолаз", "Бег на месте с высоким подниманием бедра", "Прыжки через воображаемую скакалку", "Боковые прыжки через линию", "Конькобежец", "Приседания с выпрыгиванием", "Захлёст голени"],
+    add: ["Диафрагмальное дыхание", "Дыхание: руки вверх — вдох, вниз — выдох", "Ходьба на месте"],
+    good: ["Круги руками"],
+    why: "Убрано долгое интенсивное кардио, которое может вызвать приступ. Больше дыхательных упражнений и отдыха. Ингалятор держать рядом." },
+  heart: { name: "Сердце, давление", gentle: true,
+    avoid: ["Планка на локтях", "Боковая планка", "Стульчик у стены", "Лодочка", "Супермен", "Планка вверх-вниз", "Подъёмы ног лёжа", "Скалолаз", "Бег на месте с высоким подниманием бедра", ...JUMPS],
+    add: ["Ходьба на месте", "Дыхание: руки вверх — вдох, вниз — выдох", "Подъём рук в стороны"],
+    good: ["Круги руками"],
+    why: "Убраны статические удержания и натуживание (они резко поднимают давление) и интенсивное кардио. Пульс в работе не выше 70% от максимума." },
+  weight: { name: "Лишний вес",
+    avoid: [...JUMPS],
+    add: ["Ходьба на месте"],
+    good: ["Приседания", "Ягодичный мост", "Боксёрский бой с тенью"],
+    why: "Убраны прыжки: они сильно нагружают колени и голеностоп. Остались упражнения без удара, но с работой всего тела." },
+  knees: { name: "Колени",
+    avoid: [...JUMPS, "Выпады назад", "Выпады вперёд", "Боковые выпады", "Сумо-приседания", "Стульчик у стены", "Приседания"],
+    add: ["Подъём прямой ноги лёжа", "Разгибание ноги сидя"],
+    good: ["Ягодичный мост"],
+    why: "Убраны прыжки, глубокие приседания и выпады. Мышцы бедра укрепляются без нагрузки на сустав." },
+};
+const GROUP = { cardio: "Кардио", legs: "Ноги", arms: "Руки и грудь", core: "Пресс", breath: "Дыхание", eyes: "Глаза" };
+const ORDER = ["cardio", "legs", "arms", "core"];
+// --- Stick-figure demos: each pose is 11 joints, the animation loops through key poses ---
+const J = { h: 0, n: 1, p: 2, k1: 3, f1: 4, k2: 5, f2: 6, e1: 7, a1: 8, e2: 9, a2: 10 };
+function P(s, base) {
+  const out = base ? base.map(v => v.slice()) : [];
+  const t = s.trim().split(/\s+/);
+  for (let i = 0; i < t.length; i += 2) out[J[t[i]]] = t[i + 1].split(",").map(Number);
+  return out;
+}
+const shift = (p, dx, dy, keepFeet) => p.map((v, i) => keepFeet && (i === 4 || i === 6) ? v.slice() : [v[0] + dx, v[1] + dy]);
+const swapSides = p => { const o = p.map(v => v.slice()); [[3, 5], [4, 6], [7, 9], [8, 10]].forEach(([a, b]) => { [o[a], o[b]] = [o[b], o[a]]; }); return o; };
+const mirror = p => swapSides(p.map(([x, y]) => [200 - x, y]));
+
+// front view
+const FS = P("h 100,38 n 100,56 p 100,108 k1 92,146 f1 90,184 k2 108,146 f2 110,184 e1 86,80 a1 82,104 e2 114,80 a2 118,104");
+const FJ = P("h 100,32 n 100,50 p 100,102 k1 84,140 f1 70,180 k2 116,140 f2 130,180 e1 80,32 a1 72,10 e2 120,32 a2 128,10");
+const FSC = P("e1 86,84 a1 98,96 e2 114,84 a2 102,96", FS);
+const JR_A = P("e1 90,80 a1 78,100 e2 110,80 a2 122,100", FS);
+const JR_B = shift(P("a1 76,96 a2 124,96", JR_A), 0, -10);
+const FAC = P("e1 74,58 a1 50,58 e2 126,58 a2 150,58", FS);
+const SL = P("h 70,74 n 74,92 p 82,142 k1 54,158 f1 52,184 k2 116,162 f2 146,184 e1 66,114 a1 82,108 e2 94,114 a2 84,108");
+const SUMO_S = P("h 100,38 n 100,56 p 100,108 k1 84,146 f1 70,184 k2 116,146 f2 130,184 e1 86,80 a1 98,96 e2 114,80 a2 102,96");
+const SUMO_D = P("h 100,82 n 100,100 p 100,150 k1 66,150 f1 70,184 k2 134,150 f2 130,184 e1 86,124 a1 98,140 e2 114,124 a2 102,140");
+const SK_L = P("h 66,56 n 72,72 p 80,122 k1 74,156 f1 70,184 k2 96,152 f2 112,176 e1 90,88 a1 112,98 e2 58,92 a2 50,114");
+const RT_A = P("h 92,104 n 96,122 p 100,170 k1 84,142 f1 78,164 k2 116,142 f2 122,164 e1 84,140 a1 70,156 e2 96,146 a2 72,158");
+const SP = P("h 46,140 n 60,152 p 108,168 k1 140,176 f1 172,184 k2 140,174 f2 172,181 e1 60,184 a1 82,184 e2 62,126 a2 64,102");
+// side view, facing right
+const S = P("h 100,38 n 100,56 p 100,108 k1 102,146 f1 100,184 k2 98,146 f2 98,184 e1 102,82 a1 104,106 e2 98,82 a2 96,106");
+const SA = P("e1 126,58 a1 150,60 e2 124,60 a2 148,62", S);
+const SH = P("e1 86,84 a1 98,106 e2 84,84 a2 96,106", S);
+const SJ = P("e1 116,20 a1 130,2 e2 112,22 a2 126,4", shift(S, 0, -16));
+const SQ = P("h 104,82 n 96,98 p 74,145 k1 110,150 f1 100,184 k2 108,150 f2 98,184 e1 120,104 a1 144,108 e2 118,106 a2 142,110");
+const LUNGE = P("h 90,78 n 90,96 p 90,148 k1 122,150 f1 122,184 k2 72,178 f2 40,182 e1 78,120 a1 90,140 e2 76,120 a2 88,140");
+const HK_A = P("k1 136,106 f1 134,144 e1 88,78 a1 82,100 e2 118,74 a2 132,60", S);
+const HK_B = P("k2 136,106 f2 134,144 e2 88,78 a2 82,100 e1 118,74 a1 132,60", S);
+const BK_A = P("k1 98,146 f1 68,124 e1 88,78 a1 82,100 e2 116,76 a2 122,56", S);
+const BK_B = P("k2 98,146 f2 68,124 e2 88,78 a2 82,100 e1 116,76 a1 122,56", S);
+const BOX_G = P("k1 108,146 f1 112,184 k2 92,146 f2 86,184 e1 110,78 a1 118,60 e2 106,80 a2 114,62", S);
+const WS = P("h 66,70 n 64,88 p 64,140 k1 102,140 f1 102,184 k2 100,140 f2 100,184 e1 86,100 a1 110,102 e2 84,102 a2 108,104");
+const DU = P("h 90,74 n 86,92 p 92,144 k1 128,148 f1 134,184 k2 126,148 f2 132,184 e1 84,116 a1 80,136 e2 82,116 a2 78,136");
+const DD = P("h 92,92 n 88,110 p 94,162 k1 128,154 f1 134,184 k2 126,154 f2 132,184 e1 66,118 a1 80,136 e2 64,118 a2 78,136");
+const CRCH = P("h 134,120 n 118,128 p 84,164 k1 118,152 f1 100,184 k2 116,152 f2 98,184 e1 124,154 a1 128,182 e2 122,154 a2 126,182");
+const PL = P("h 156,128 n 140,134 p 94,155 k1 60,170 f1 28,184 k2 62,170 f2 30,184 e1 140,159 a1 140,184 e2 138,159 a2 138,184");
+const PD = P("h 157,162 n 140,166 p 94,174 k1 60,180 f1 28,184 k2 62,180 f2 30,184 e1 118,156 a1 140,184 e2 116,156 a2 138,184");
+const PE = P("h 156,155 n 140,160 p 92,170 k1 58,177 f1 24,184 k2 60,177 f2 26,184 e1 140,184 a1 164,184 e2 138,184 a2 162,184");
+const BA = P("h 164,130 n 148,134 p 92,132 k1 96,170 f1 64,184 k2 94,170 f2 62,184 e1 150,160 a1 150,184 e2 148,160 a2 148,184");
+const SM_D = P("h 160,172 n 142,176 p 92,178 k1 56,180 f1 20,182 k2 56,180 f2 20,182 e1 166,176 a1 190,176 e2 166,176 a2 190,176");
+const SM_U = P("h 152,154 n 138,164 p 92,178 k1 56,176 f1 22,168 k2 56,176 f2 22,168 e1 160,154 a1 182,144 e2 160,154 a2 182,144");
+// lying on the back, head to the left
+const GB_D = P("h 30,174 n 48,178 p 100,178 k1 130,148 f1 140,184 k2 128,148 f2 138,184 e1 72,182 a1 96,183 e2 70,182 a2 94,183");
+const GB_U = P("p 96,148 k1 132,140 k2 130,140", GB_D);
+const CU_D = P("e1 40,162 a1 28,170 e2 38,162 a2 26,170", GB_D);
+const CU_U = P("h 46,146 n 58,160 e1 62,140 a1 44,146 e2 60,140 a2 42,146", CU_D);
+const BI_A = P("k1 78,142 f1 110,134 k2 136,168 f2 172,160", CU_U);
+const BI_B = P("k2 78,142 f2 110,134 k1 136,168 f1 172,160", CU_U);
+const LR_D = P("h 30,176 n 48,178 p 100,180 k1 138,177 f1 175,174 k2 136,177 f2 173,174 e1 72,182 a1 96,183 e2 70,182 a2 94,183");
+const LR_U = P("k1 108,143 f1 116,107 k2 106,143 f2 114,107", LR_D);
+const DB0 = P("h 30,174 n 48,178 p 100,178 k1 100,140 f1 136,140 k2 98,140 f2 134,140 e1 50,152 a1 52,128 e2 48,152 a2 50,128");
+
+const WALL = '<rect class="prop" x="44" y="16" width="12" height="172" rx="2"/>';
+const BENCH = '<rect class="prop" x="44" y="138" width="34" height="50" rx="3"/>';
+const ANIM = {
+  "Прыжки «звёздочка»": { k: [FS, FJ], ms: 420 },
+  "Бег на месте с высоким подниманием бедра": { k: [HK_A, HK_B], ms: 330 },
+  "Бёрпи": { k: [S, CRCH, PL, CRCH, SJ], ms: 520 },
+  "Скалолаз": { k: [MC(1), MC(2)], ms: 330 },
+  "Прыжки через воображаемую скакалку": { k: [JR_A, JR_B], ms: 300 },
+  "Боковые прыжки через линию": { k: [shift(FS, -18, 0), shift(FS, 0, -14), shift(FS, 18, 0), shift(FS, 0, -14)], ms: 260 },
+  "Захлёст голени": { k: [BK_A, BK_B], ms: 320 },
+  "Конькобежец": { k: [SK_L, mirror(SK_L)], ms: 560 },
+  "Боксёрский бой с тенью": { k: [BOX_G, P("e1 124,58 a1 150,56", BOX_G), BOX_G, P("e2 124,60 a2 148,58", BOX_G)], ms: 260 },
+  "Приседания": { k: [SA, SQ], ms: 800 },
+  "Выпады назад": { k: [SH, LUNGE], ms: 800 },
+  "Выпады вперёд": { k: [shift(SH, -10, 0), LUNGE], ms: 800 },
+  "Боковые выпады": { k: [FSC, SL, FSC, mirror(SL)], ms: 750 },
+  "Сумо-приседания": { k: [SUMO_S, SUMO_D], ms: 800 },
+  "Приседания с выпрыгиванием": { k: [SQ, SJ], ms: 520 },
+  "Стульчик у стены": { k: [WS, P("h 66,68 n 64,87", WS)], ms: 1400, prop: WALL },
+  "Подъёмы на носки": { k: [S, shift(S, 0, -9, true)], ms: 700 },
+  "Ягодичный мост": { k: [GB_D, GB_U], ms: 850 },
+  "Отжимания": { k: [PL, PD], ms: 750 },
+  "Отжимания с широкой постановкой рук": { k: [PL, PD], ms: 750 },
+  "Отжимания с узкой постановкой рук": { k: [PL, P("e1 124,170 e2 122,170", PD)], ms: 750 },
+  "Обратные отжимания от скамейки": { k: [DU, DD], ms: 800, prop: BENCH },
+  "Планка с касанием плеч": { k: [PL, P("e1 152,150 a1 136,138", PL), PL, P("e2 150,150 a2 134,138", PL)], ms: 420 },
+  "Медведь (ходьба в упоре)": { k: [BA, P("e1 162,158 a1 168,184 k2 110,170 f2 80,184", BA), BA, P("e2 160,158 a2 166,184 k1 110,170 f1 80,184", BA)], ms: 380 },
+  "Планка вверх-вниз": { k: [PE, PL], ms: 700 },
+  "Круги руками": { k: [P("a1 50,52 a2 150,52", FAC), P("a1 56,58 a2 144,58", FAC), P("a1 50,64 a2 150,64", FAC), P("a1 44,58 a2 156,58", FAC)], ms: 200 },
+  "Супермен": { k: [SM_D, SM_U], ms: 900 },
+  "Лодочка": { k: [SM_D, SM_U], ms: 1100 },
+  "Планка на локтях": { k: [PE, P("p 92,167 k1 58,175 k2 60,175", PE)], ms: 1400 },
+  "Скручивания": { k: [CU_D, CU_U], ms: 700 },
+  "Велосипед": { k: [BI_A, BI_B], ms: 520 },
+  "Боковая планка": { k: [SP, P("p 108,164 k1 140,174 k2 140,172", SP)], ms: 1400 },
+  "Подъёмы ног лёжа": { k: [LR_D, LR_U], ms: 900 },
+  "Ножницы": { k: [P("k1 136,168 f1 172,158 k2 138,175 f2 174,172", LR_D), P("k2 136,168 f2 172,158 k1 138,175 f1 174,172", LR_D)], ms: 380 },
+  "Русские скручивания": { k: [RT_A, mirror(RT_A)], ms: 600 },
+  "Мёртвый жук": { k: [DB0, P("e1 26,172 a1 4,176 k2 136,170 f2 172,166", DB0), DB0, P("e2 26,172 a2 4,176 k1 136,170 f1 172,166", DB0)], ms: 650 },
+};
+// ЛФК poses
+const QUAD = P("h 156,134 n 140,140 p 90,146 k1 90,184 f1 54,184 k2 88,184 f2 52,184 e1 140,162 a1 140,184 e2 138,162 a2 138,184");
+const SIT = P("h 90,77 n 90,95 p 90,147 k1 128,147 f1 128,184 k2 126,147 f2 126,184 e1 100,120 a1 122,142 e2 98,120 a2 120,142");
+const TOE = shift(S, 0, -8, true);
+const EDGE = P("k1 86,146 f1 90,184 k2 114,146 f2 110,184", FS);
+const WALLST = shift(S, -38, 0);
+const SLR0 = P("k2 130,148 f2 140,184", LR_D);
+const BELLY = P("e1 64,160 a1 80,172", GB_D);
+const ARMS_UP = P("e1 80,32 a1 72,10 e2 120,32 a2 128,10", FS);
+const CHAIR = '<rect class="prop" x="66" y="88" width="5" height="66"/><rect class="prop" x="66" y="151" width="42" height="6" rx="2"/><rect class="prop" x="68" y="151" width="5" height="37"/><rect class="prop" x="101" y="151" width="5" height="37"/>';
+Object.assign(ANIM, {
+  "Кошка-корова": { k: [P("h 150,156 n 140,132 p 90,138", QUAD), P("h 160,120 n 140,148 p 90,152", QUAD)], ms: 1500 },
+  "Плавание брассом лёжа": { k: [SM_U, P("e1 128,160 a1 110,170 e2 128,160 a2 110,170", SM_U)], ms: 900 },
+  "Стойка у стены": { k: [WALLST, P("h 62,37 n 62,55", WALLST)], ms: 1600, prop: WALL },
+  "Ходьба на носках": { k: [TOE, P("k1 108,134 f1 110,172", TOE), TOE, P("k2 108,134 f2 110,172", TOE)], ms: 380 },
+  "Ходьба на внешнем крае стопы": { k: [EDGE, P("k1 84,138 f1 86,176", EDGE), EDGE, P("k2 116,138 f2 114,176", EDGE)], ms: 450 },
+  "Катание мяча стопой": { k: [P("k1 134,147 f1 142,177", SIT), P("k1 122,147 f1 116,177", SIT)], ms: 700, prop: CHAIR + '<circle class="prop" cx="129" cy="183" r="6"/>' },
+  "Разгибание ноги сидя": { k: [SIT, P("f1 165,145", SIT)], ms: 1000, prop: CHAIR },
+  "Подъём прямой ноги лёжа": { k: [SLR0, P("k1 128,150 f1 154,124", SLR0)], ms: 1000 },
+  "Диафрагмальное дыхание": { k: [BELLY, P("p 100,175 e1 64,155 a1 80,165", BELLY)], ms: 1900 },
+  "Дыхание: руки вверх — вдох, вниз — выдох": { k: [FS, ARMS_UP], ms: 1900 },
+  "Ходьба на месте": { k: [P("k1 116,136 f1 110,172 e1 94,80 a1 90,104 e2 108,80 a2 116,102", S), P("k2 116,136 f2 110,172 e2 94,80 a2 90,104 e1 108,80 a1 116,102", S)], ms: 520 },
+  "Подъём рук в стороны": { k: [FS, FAC], ms: 1300 },
+  "Гимнастика для глаз": { eyes: [[0, 0], [-10, 0], [0, 0], [10, 0], [0, 0], [0, -7], [0, 0], [0, 7]], ms: 650 },
+});
+// Exercises drawn from the front (toes turn outward instead of forward)
+const FRONT = new Set(["Прыжки «звёздочка»", "Прыжки через воображаемую скакалку", "Боковые прыжки через линию", "Конькобежец", "Боковые выпады", "Сумо-приседания", "Круги руками", "Русские скручивания", "Боковая планка", "Ходьба на внешнем крае стопы", "Дыхание: руки вверх — вдох, вниз — выдох", "Подъём рук в стороны"]);
+// Technique cue per key pose: shown while the figure moves INTO that pose
+const PUSH = ["Выпрями руки — выдох", "Грудь к полу, тело прямое — вдох"];
+const CUES = {
+  "Прыжки «звёздочка»": ["Ноги вместе, руки вниз", "Прыжок: ноги врозь, руки вверх"],
+  "Бег на месте с высоким подниманием бедра": ["Колено до пояса", "Смена ноги, работай руками"],
+  "Бёрпи": ["Выпрямись", "Присед, ладони на пол", "Ноги назад — планка", "Ноги к рукам", "Прыжок вверх"],
+  "Скалолаз": ["Колено к груди", "Смена ноги, таз не поднимай"],
+  "Прыжки через воображаемую скакалку": ["Мягко на носки", "Прыжок, кисти вращаются"],
+  "Боковые прыжки через линию": ["Приземлись слева", "Прыжок", "Приземлись справа", "Прыжок"],
+  "Захлёст голени": ["Пятка к ягодице", "Смена ноги"],
+  "Конькобежец": ["Прыжок влево на одну ногу", "Прыжок вправо на одну ногу"],
+  "Боксёрский бой с тенью": ["Стойка, кулаки у подбородка", "Прямой удар", "Рука назад к подбородку", "Удар другой рукой"],
+  "Приседания": ["Вверх через пятки — выдох", "Таз назад, бёдра параллельно полу — вдох"],
+  "Выпады назад": ["Вернись в стойку — выдох", "Шаг назад, оба колена 90° — вдох"],
+  "Выпады вперёд": ["Вернись в стойку — выдох", "Шаг вперёд, колено над стопой — вдох"],
+  "Боковые выпады": ["Вернись в центр", "Шаг в сторону, садись на ногу", "Вернись в центр", "Выпад в другую сторону"],
+  "Сумо-приседания": ["Вверх — выдох", "Колени наружу, вниз — вдох"],
+  "Приседания с выпрыгиванием": ["Мягкое приземление в присед", "Мощный прыжок вверх"],
+  "Стульчик у стены": ["Бёдра параллельно полу", "Держи, дыши ровно"],
+  "Подъёмы на носки": ["Медленно опустись", "Вверх на носки, пауза"],
+  "Ягодичный мост": ["Опусти таз — вдох", "Таз вверх, сожми ягодицы — выдох"],
+  "Отжимания": PUSH,
+  "Отжимания с широкой постановкой рук": ["Выпрями руки — выдох", "Локти в стороны 45° — вдох"],
+  "Отжимания с узкой постановкой рук": ["Выпрями руки — выдох", "Локти вдоль корпуса — вдох"],
+  "Обратные отжимания от скамейки": ["Выпрями руки — выдох", "Локти назад до 90° — вдох"],
+  "Планка с касанием плеч": ["Планка", "Ладонь к плечу, таз неподвижен", "Планка", "Другой рукой"],
+  "Медведь (ходьба в упоре)": ["Колени над полом", "Шаг рукой и ногой", "Колени над полом", "Шаг другой парой"],
+  "Планка вверх-вниз": ["Опустись на локти", "Поднимись на ладони"],
+  "Круги руками": ["Мелкие круги прямыми руками", "Мелкие круги прямыми руками", "Плечи опущены", "Плечи опущены"],
+  "Супермен": ["Опустись — вдох", "Руки и грудь вверх — выдох"],
+  "Лодочка": ["Расслабься", "Руки и ноги вверх, держи"],
+  "Планка на локтях": ["Живот втянут", "Тело — прямая линия"],
+  "Скручивания": ["Опустись медленно — вдох", "Лопатки от пола — выдох"],
+  "Велосипед": ["Локоть к противоположному колену", "Смена стороны"],
+  "Боковая планка": ["Таз вверх", "Держи прямую линию"],
+  "Подъёмы ног лёжа": ["Опускай медленно, поясница прижата", "Ноги вверх — выдох"],
+  "Ножницы": ["Скрести ноги", "Смена"],
+  "Русские скручивания": ["Поворот влево", "Поворот вправо"],
+  "Мёртвый жук": ["Руки и колени вверх", "Рука и противоположная нога вниз", "Вернись", "Другая пара"],
+  "Кошка-корова": ["Спина вверх, голова вниз — выдох", "Мягкий прогиб — вдох"],
+  "Плавание брассом лёжа": ["Руки вперёд", "Разведи руки назад, лопатки вместе"],
+  "Стойка у стены": ["Затылок, лопатки, ягодицы у стены", "Дыши ровно"],
+  "Ходьба на носках": ["Высоко на носках", "Шаг", "Высоко на носках", "Шаг"],
+  "Ходьба на внешнем крае стопы": ["Вес на внешних краях стоп", "Шаг", "Вес на внешних краях стоп", "Шаг"],
+  "Катание мяча стопой": ["Катим к пальцам", "Катим к пятке"],
+  "Разгибание ноги сидя": ["Медленно опусти", "Выпрями колено, пауза 2 секунды"],
+  "Подъём прямой ноги лёжа": ["Медленно опусти", "Прямую ногу вверх"],
+  "Диафрагмальное дыхание": ["Выдох ртом — живот опускается", "Вдох носом — живот поднимается"],
+  "Дыхание: руки вверх — вдох, вниз — выдох": ["Руки вниз — длинный выдох", "Руки вверх — вдох носом"],
+  "Ходьба на месте": ["Спокойный шаг", "Руки работают свободно"],
+  "Подъём рук в стороны": ["Медленно опусти", "Руки до уровня плеч"],
+  "Гимнастика для глаз": ["Прямо", "Влево", "Прямо", "Вправо", "Прямо", "Вверх", "Прямо", "Вниз"],
+};
+function MC(leg) { return leg === 1 ? P("k1 128,166 f1 100,184", PL) : P("k2 128,166 f2 100,184", PL); }
+
+const REDUCED = matchMedia("(prefers-reduced-motion: reduce)").matches;
+const figs = new Set();
+const ease = x => { x = Math.min(1, Math.max(0, (x - 0.12) / 0.76)); return x * x * (3 - 2 * x); };
+function makeFig(el, name) {
+  const a = ANIM[name];
+  el._name = name;
+  el._fig = null;
+  if (!a) { el.hidden = true; return; }
+  el.hidden = false;
+  if (a.eyes) {
+    el.innerHTML = `<svg viewBox="0 0 200 194" role="img" aria-label="Анимация: ${name}">
+      <ellipse class="eye" cx="66" cy="97" rx="30" ry="18"/><ellipse class="eye" cx="134" cy="97" rx="30" ry="18"/>
+      <circle class="pupil" cx="66" cy="97" r="9"/><circle class="pupil" cx="134" cy="97" r="9"/></svg><p class="cue"></p>`;
+    const f = { el, a, pupils: el.querySelectorAll(".pupil"), cues: CUES[name], cueEl: el.querySelector(".cue"), t0: performance.now() };
+    el._fig = f; figs.add(f); draw(f, f.t0);
+    return;
+  }
+  const seg = s => SEGS.filter(x => x[3] === s).map(([c]) => `<line class="${c}"/>`).join("");
+  el.innerHTML = `<svg viewBox="0 0 200 194" role="img" aria-label="Анимация: ${name}">
+    <line class="ground" x1="6" y1="189" x2="194" y2="189"/>${a.prop || ""}
+    <g class="far">${seg("far")}<circle class="hand" r="4.5"/></g>
+    ${seg("mid")}<circle class="head" r="12"/>
+    ${seg("near")}<circle class="hand" r="4.5"/></svg><p class="cue"></p>`;
+  const f = { el, a, cues: CUES[name], lines: el.querySelectorAll("svg > g > line, svg > line:not(.ground)"), hands: el.querySelectorAll("circle.hand"), head: el.querySelector("circle.head"), cueEl: el.querySelector(".cue"), front: FRONT.has(name), t0: performance.now() };
+  el._fig = f;
+  figs.add(f);
+  draw(f, f.t0 + (REDUCED ? a.ms : 0));
+}
+function draw(f, now) {
+  if (f.a.eyes) {
+    const k = f.a.eyes, n = k.length, t = ((now - f.t0) % (n * f.a.ms)) / f.a.ms, i = Math.floor(t), u = ease(t - i);
+    const A = k[i], B = k[(i + 1) % n], dx = A[0] + (B[0] - A[0]) * u, dy = A[1] + (B[1] - A[1]) * u;
+    f.pupils.forEach((c, j) => { c.setAttribute("cx", (j ? 134 : 66) + dx); c.setAttribute("cy", 97 + dy); });
+    const cue = f.cues ? f.cues[(i + 1) % n] : "";
+    if (cue !== f.lastCue) { f.lastCue = cue; f.cueEl.textContent = cue; }
+    return;
+  }
+  const k = f.a.k, n = k.length, t = ((now - f.t0) % (n * f.a.ms)) / f.a.ms, i = Math.floor(t), u = ease(t - i);
+  const A = k[i], B = k[(i + 1) % n];
+  const q = A.map((v, j) => [v[0] + (B[j][0] - v[0]) * u, v[1] + (B[j][1] - v[1]) * u]);
+  // toes: perpendicular to the shin (side view, facing right) or turned outward (front view)
+  const toe = (k, ft) => {
+    const K = q[k], F = q[ft];
+    if (f.front) return [F[0] + (F[0] < q[2][0] ? -8 : 8), F[1]];
+    const dx = F[0] - K[0], dy = F[1] - K[1], l = Math.hypot(dx, dy) || 1;
+    return [F[0] + 11 * dy / l, F[1] - 11 * dx / l];
+  };
+  q.push(toe(5, 6), toe(3, 4));   // 11: far toe, 12: near toe
+  f.lines.forEach((el, i) => {
+    const [, a1, a2] = SEGS[i], A = q[a1], B = q[a2];
+    el.setAttribute("x1", A[0].toFixed(1)); el.setAttribute("y1", A[1].toFixed(1));
+    el.setAttribute("x2", B[0].toFixed(1)); el.setAttribute("y2", B[1].toFixed(1));
+  });
+  f.hands[0].setAttribute("cx", q[10][0]); f.hands[0].setAttribute("cy", q[10][1]);
+  f.hands[1].setAttribute("cx", q[8][0]); f.hands[1].setAttribute("cy", q[8][1]);
+  f.head.setAttribute("cx", q[0][0]); f.head.setAttribute("cy", q[0][1]);
+  const cue = f.cues ? f.cues[(i + 1) % n] : "";
+  if (cue !== f.lastCue) { f.lastCue = cue; f.cueEl.textContent = cue; }
+}
+// Body segments in paint order: [class, from joint, to joint, layer]
+const SEGS = [
+  ["ua shirt", 1, 9, "far"], ["fa skin", 9, 10, "far"], ["th shorts", 2, 5, "far"], ["sh skin", 5, 6, "far"], ["foot shoe", 6, 11, "far"],
+  ["neck skin", 1, 0, "mid"], ["torso shirt", 1, 2, "mid"],
+  ["th shorts", 2, 3, "near"], ["sh skin", 3, 4, "near"], ["foot shoe", 4, 12, "near"], ["ua shirt", 1, 7, "near"], ["fa skin", 7, 8, "near"],
+];
+// The far group's lines come first in the DOM, then mid, then near: reorder SEGS the same way
+SEGS.sort((x, y) => ["far", "mid", "near"].indexOf(x[3]) - ["far", "mid", "near"].indexOf(y[3]));
+function animate() {
+  const now = performance.now();
+  for (const f of figs) { if (!f.el.isConnected || f.el._fig !== f) { figs.delete(f); continue; } draw(f, now); }
+}
+
+const LEVELS = [ { work: 20, rest: 40, name: "новичок" }, { work: 30, rest: 30, name: "средний" }, { work: 40, rest: 20, name: "продвинутый" } ];
+const PREP = 10, ROUND_REST = 60;
+
+const $ = id => document.getElementById(id);
+const val = name => name === "cnt" ? +$("cnt").value : +document.querySelector(`input[name=${name}]:checked`).value;
+const plural = (n, one, few, many) => { const a = n % 10, b = n % 100; return a === 1 && b !== 11 ? one : a >= 2 && a <= 4 && (b < 12 || b > 14) ? few : many; };
+const fmt = s => `${Math.floor(s / 60)}:${String(Math.max(0, s) % 60).padStart(2, "0")}`;
+const shuffle = a => { for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; };
+
+let plan = [];   // chosen exercises
+let steps = [];  // timeline
+let idx = 0, remaining = 0, running = false, endAt = 0, timer = null, soundOn = true, actx = null;
+let voiceOn = !!window.speechSynthesis, ratings = {}, borgMsgs = {}, manualAsk = false, showBorgFor = null;
+
+// Voice coach: browser speech synthesis, Russian voice if the device has one
+function say(text, onstart) {
+  if (!voiceOn) return false;
+  try {
+    if (speechSynthesis.speaking || speechSynthesis.pending) speechSynthesis.cancel();
+    const u = new SpeechSynthesisUtterance(text);
+    u.lang = "ru-RU"; u.rate = 1.05;
+    const v = speechSynthesis.getVoices().find(v => /^ru/i.test(v.lang));
+    if (v) u.voice = v;
+    if (onstart) u.onstart = onstart;
+    speechSynthesis.resume();
+    speechSynthesis.speak(u);
+    return true;
+  } catch (_) { return false; }
+}
+function voiceStatus(text) { $("voiceStatus").hidden = !text; $("voiceStatus").textContent = text || ""; }
+function testVoice() {
+  if (!window.speechSynthesis) { voiceStatus("Этот браузер не умеет озвучивать текст. Открой сайт в Chrome, Safari или Edge."); return; }
+  if (!voiceOn) { voiceOn = true; $("voice").textContent = "Голос: вкл"; $("voice").setAttribute("aria-pressed", true); }
+  let started = false;
+  voiceStatus("Проверяю голос…");
+  say("Голосовой тренер включён. Удачной тренировки!", () => { started = true; voiceStatus("Голос работает."); });
+  setTimeout(() => {
+    if (started) return;
+    const n = speechSynthesis.getVoices().length;
+    voiceStatus(n ? "Голос не прозвучал. Проверь громкость и беззвучный режим на телефоне, затем нажми ещё раз." : "На этом устройстве не установлены голоса для озвучки. Попробуй другой браузер (Chrome, Safari) или другое устройство.");
+  }, 2500);
+}
+
+// Borg RPE scale (6–20), asked after every round
+const BORG = [[7, "Очень-очень легко"], [9, "Очень легко"], [11, "Легко"], [13, "Умеренно"], [15, "Тяжело"], [17, "Очень тяжело"], [19, "Предельно"]];
+function askedRound() {
+  const s = steps[idx];
+  if (!s) return null;
+  if (manualAsk) return s.type === "done" ? val("rnd") : s.round + 1;   // current round, asked by the button
+  if (s.type === "rest" && s.roundBreak) return s.round;   // round s.round (1-based) just finished
+  if (s.type === "done") return val("rnd");
+  return null;
+}
+function lighten() {
+  for (let i = idx + 1; i < steps.length; i++) {
+    const s = steps[i];
+    if (s.type === "work") s.dur = Math.max(15, s.dur - 10);
+    else if (s.type === "rest" && !s.roundBreak) s.dur += 10;
+  }
+}
+function rate(v) {
+  const r = askedRound();
+  if (r == null) return;
+  ratings[r] = v;
+  const lfk = selectedConds().length > 0, lo = lfk ? 11 : 12, hi = lfk ? 13 : 15, last = steps[idx].type === "done";
+  let msg;
+  if (v < lo) msg = "Нагрузка лёгкая. " + (lfk ? "Для ЛФК это нормально, продолжай в том же темпе." : last ? "В следующий раз можно выбрать уровень выше." : "Можно продолжать в том же темпе.");
+  else if (v <= hi) msg = lfk ? "Оптимальная нагрузка для ЛФК. Так держать!" : "Оптимальная нагрузка. Так держать!";
+  else if (v <= hi + 2) {
+    if (last) msg = "Было тяжеловато. В следующий раз выбери уровень ниже.";
+    else { lighten(); msg = "Тяжеловато, поэтому нагрузка снижена: работа на 10 секунд короче, отдых на 10 секунд длиннее."; }
+  } else {
+    if (!last) { lighten(); stop(); }
+    msg = "Слишком тяжело. Остановись, спокойно походи и восстанови дыхание. Если есть боль или головокружение, скажи преподавателю.";
+  }
+  borgMsgs[r] = msg;
+  manualAsk = false;
+  showBorgFor = r;
+  say(msg);
+  $("borgLog").hidden = false;
+  $("borgLog").textContent = "Самочувствие по Боргу: " + Object.entries(ratings).map(([k, x]) => `круг ${k} — ${x}`).join(", ");
+  render();
+}
+
+const selectedConds = () => [...document.querySelectorAll("#conds input:checked")].map(i => i.value);
+function pool() {
+  const conds = selectedConds();
+  const avoid = new Set(conds.flatMap(c => CONDS[c].avoid));
+  const addNames = new Set(conds.flatMap(c => CONDS[c].add));
+  const added = EX_LFK.filter(e => addNames.has(e.n));
+  return { conds, avoid, added, list: EX.filter(e => !avoid.has(e.n)).concat(added) };
+}
+const helps = (e, conds) => conds.filter(c => CONDS[c].add.includes(e.n) || CONDS[c].good.includes(e.n)).map(c => CONDS[c].name);
+
+function generate() {
+  const cnt = val("cnt"), { list, added } = pool(), used = new Set();
+  plan = [];
+  const take = e => { if (e && !used.has(e.n) && plan.length < cnt) { plan.push(e); used.add(e.n); return true; } return false; };
+  shuffle(added.slice()).forEach(take);   // therapeutic exercises go in first
+  const pools = Object.fromEntries(ORDER.map(g => [g, shuffle(list.filter(e => e.g === g && !used.has(e.n)))]));
+  for (let i = 0; plan.length < cnt && i < cnt * 4; i++) take(pools[ORDER[i % 4]].pop());
+  shuffle(list.slice()).forEach(take);    // a group ran out: fill from anything allowed
+  shuffle(plan);
+  $("cntOut").textContent = cnt;
+  build();
+}
+
+function swapOne(i) {
+  const used = new Set(plan.map(e => e.n)), list = pool().list;
+  let opts = list.filter(e => e.g === plan[i].g && !used.has(e.n));
+  if (!opts.length) opts = list.filter(e => !used.has(e.n));
+  if (!opts.length) return;
+  plan[i] = opts[Math.floor(Math.random() * opts.length)];
+  build();
+}
+
+function build() {
+  stop();
+  const { conds, avoid } = pool(), base = LEVELS[val("lvl")], R = val("rnd");
+  const gentle = conds.some(c => CONDS[c].gentle);
+  const L = !conds.length ? base : { name: base.name + ", щадящий режим ЛФК", work: Math.min(base.work, gentle ? 20 : 30), rest: Math.max(base.rest, gentle ? 40 : 30) };
+  renderNote(conds, avoid, L);
+  steps = [{ type: "prep", dur: PREP, ex: 0, round: 0 }];
+  for (let r = 0; r < R; r++) {
+    plan.forEach((e, i) => {
+      steps.push({ type: "work", dur: L.work, ex: i, round: r });
+      const lastInRound = i === plan.length - 1;
+      if (lastInRound && r < R - 1) steps.push({ type: "rest", dur: ROUND_REST, ex: 0, round: r + 1, roundBreak: true });
+      else if (!lastInRound) steps.push({ type: "rest", dur: L.rest, ex: i + 1, round: r });
+    });
+  }
+  steps.push({ type: "done", dur: 0, ex: plan.length - 1, round: R - 1 });
+  const total = steps.reduce((s, x) => s + x.dur, 0);
+  $("summary").textContent = `≈ ${Math.round(total / 60)} мин · ${L.work}/${L.rest} с`;
+  $("modeLbl").textContent = `Уровень: ${L.name}, ${R} ${plural(R, "круг", "круга", "кругов")} по ${plan.length} ${plural(plan.length, "станции", "станции", "станций")}`;
+  $("stations").innerHTML = plan.map((e, i) => ({ e, i, h: helps(e, conds) })).map(({ e, i, h }) => `
+    <li class="station${h.length ? " helps" : ""}" id="st${i}">
+      <div class="station-top"><span class="num">${String(i + 1).padStart(2, "0")}</span><span class="chip ${e.g}">${GROUP[e.g]}</span></div>
+      <div class="fig" data-ex="${e.n}"></div>
+      <h3>${e.n}</h3>
+      ${h.length ? `<span class="good">Полезно: ${h.join(", ")}</span>` : ""}
+      <p>${e.t}</p>
+      <button class="swap" data-i="${i}">Заменить упражнение</button>
+    </li>`).join("");
+  document.querySelectorAll("#stations .fig").forEach(el => makeFig(el, el.dataset.ex));
+  $("boardFig")._name = null;
+  ratings = {}; borgMsgs = {}; manualAsk = false; showBorgFor = null;
+  $("borgLog").textContent = "После каждого круга здесь появится оценка самочувствия по шкале Борга. Можно оценить и в любой момент кнопкой «Оценить самочувствие».";
+  idx = 0; remaining = steps[0].dur;
+  render();
+  if (typeof coachChips === "function" && $("coachChips")) coachChips();
+}
+
+function renderNote(conds, avoid, L) {
+  const box = $("lfkNote");
+  box.hidden = !conds.length;
+  if (!conds.length) return;
+  const short = plan.length < val("cnt") ? `<p class="warn">Подходящих упражнений хватило только на ${plan.length} ${plural(plan.length, "станцию", "станции", "станций")}.</p>` : "";
+  box.innerHTML = `
+    <div class="lfk-head"><span class="eyebrow">Режим ЛФК</span><span class="muted">Работа ${L.work} с · отдых ${L.rest} с</span></div>
+    <ul>${conds.map(c => `<li><b>${CONDS[c].name}.</b> ${CONDS[c].why}</li>`).join("")}</ul>
+    ${short}
+    <details><summary>Убрано из тренировки: ${avoid.size} ${plural(avoid.size, "упражнение", "упражнения", "упражнений")}</summary><p>${[...avoid].join(", ")}</p></details>
+    <p class="disclaimer">Это примерный подбор по общим правилам ЛФК. Какие упражнения можно именно тебе, решают врач и преподаватель ЛФК. При боли, головокружении или одышке — сразу остановиться.</p>`;
+}
+
+function totalLeft() {
+  let s = remaining;
+  for (let i = idx + 1; i < steps.length; i++) s += steps[i].dur;
+  return s;
+}
+
+function render() {
+  const s = steps[idx], R = val("rnd"), e = plan[s.ex];
+  const phase = $("phase");
+  phase.className = "phase" + (s.type === "work" ? " work" : s.type === "rest" ? " rest" : "");
+  phase.textContent = { prep: running ? "Приготовься" : "Готов к старту", work: "Работа", rest: s.roundBreak ? "Отдых между кругами" : "Отдых — переход", done: "Тренировка завершена" }[s.type];
+  $("clock").textContent = fmt(s.type === "done" ? 0 : remaining);
+  $("roundLbl").textContent = `Круг ${s.round + 1} из ${R}`;
+  $("stationLbl").textContent = `Станция ${s.ex + 1} из ${plan.length}`;
+  $("leftLbl").textContent = `Осталось ${fmt(totalLeft())}`;
+  const bf = $("boardFig");
+  if (s.type === "done") { bf.hidden = true; bf._fig = null; bf._name = null; }
+  else if (bf._name !== e.n) makeFig(bf, e.n);
+  if (s.type === "done") {
+    $("nowName").textContent = "Молодец!";
+    $("nowTip").textContent = "Теперь заминка: спокойная ходьба и растяжка 3–5 минут.";
+    $("nextLbl").textContent = "";
+  } else {
+    $("nowName").textContent = (s.type === "work" ? "" : "Далее: ") + e.n;
+    $("nowTip").textContent = e.t;
+    const nxt = steps.slice(idx + 1).find(x => x.type === "work");
+    $("nextLbl").textContent = s.type === "work" && nxt ? `Следующее: ${plan[nxt.ex].n}` : "";
+  }
+  $("bar").style.width = (s.dur ? (1 - remaining / s.dur) * 100 : 100) + "%";
+  document.querySelectorAll(".station").forEach((el, i) => el.classList.toggle("active", s.type !== "done" && i === s.ex));
+  $("start").textContent = running ? "Пауза" : (idx === 0 && remaining === steps[0].dur ? "Старт" : s.type === "done" ? "Ещё раз" : "Продолжить");
+  $("skip").disabled = s.type === "done";
+  const ar = askedRound() ?? showBorgFor, rated = ar != null && ratings[ar] != null;
+  $("borg").hidden = ar == null;
+  if (ar != null) {
+    $("borgTitle").textContent = rated ? `Круг ${ar}: ${ratings[ar]} по шкале Борга` : `Круг ${ar} пройден. Как тяжело было?`;
+    $("borgScale").hidden = rated;
+    $("borgMsg").hidden = !rated;
+    $("borgMsg").textContent = borgMsgs[ar] || "";
+  }
+}
+
+function beep(freq = 880, len = 0.15) {
+  if (!soundOn) return;
+  try {
+    actx = actx || new (window.AudioContext || window.webkitAudioContext)();
+    const o = actx.createOscillator(), g = actx.createGain();
+    o.frequency.value = freq; o.connect(g); g.connect(actx.destination);
+    g.gain.setValueAtTime(0.25, actx.currentTime);
+    g.gain.exponentialRampToValueAtTime(0.001, actx.currentTime + len);
+    o.start(); o.stop(actx.currentTime + len);
+  } catch (_) {}
+}
+
+function next() {
+  manualAsk = false; showBorgFor = null;
+  idx = Math.min(idx + 1, steps.length - 1);
+  remaining = steps[idx].dur;
+  const s = steps[idx], t = s.type;
+  if (t === "work") { beep(1046, 0.4); say(`Работа! ${plan[s.ex].n}`); }
+  else if (t === "rest") {
+    beep(523, 0.4);
+    say(s.roundBreak ? `Круг ${s.round} завершён. Отдых минута. Оцени, насколько было тяжело.` : `Отдых. Дальше: ${plan[s.ex].n}`);
+  }
+  else if (t === "done") { beep(784, 0.2); setTimeout(() => beep(1046, 0.5), 220); stop(); say("Тренировка завершена. Молодец! Оцени последний круг, а потом сделай заминку и растяжку."); }
+  if (running) endAt = Date.now() + remaining * 1000;
+}
+
+function tick() {
+  const left = Math.ceil((endAt - Date.now()) / 1000);
+  if (left !== remaining) {
+    remaining = left;
+    if (remaining <= 3 && remaining > 0) {
+      beep(660, 0.1);
+      if (steps[idx].type !== "work") say(["", "Один", "Два", "Три"][remaining]);
+    }
+  }
+  if (remaining <= 0) next();
+  render();
+}
+
+function start() {
+  if (steps[idx].type === "done") { idx = 0; remaining = steps[0].dur; }
+  const fresh = idx === 0 && remaining === steps[0].dur;
+  running = true; endAt = Date.now() + remaining * 1000;
+  timer = setInterval(tick, 200);
+  beep(880, 0.1);
+  if (fresh) say(`Приготовься. Первое упражнение: ${plan[0].n}`);
+  render();
+}
+function stop() { running = false; clearInterval(timer); timer = null; }
+
+$("start").onclick = () => { if (running) { stop(); try { speechSynthesis.cancel(); } catch (_) {} } else start(); render(); };
+$("voiceTest").onclick = testVoice;
+$("borgNow").onclick = () => {
+  const s = steps[idx], r = s.type === "done" ? val("rnd") : s.round + 1;
+  delete ratings[r]; manualAsk = true; showBorgFor = null;
+  render();
+  $("borg").scrollIntoView({ block: "nearest", behavior: "smooth" });
+};
+if (!window.speechSynthesis) { $("voice").textContent = "Голос: нет"; }
+$("voice").onclick = e => { if (!window.speechSynthesis) { testVoice(); return; } voiceOn = !voiceOn; if (!voiceOn) try { speechSynthesis.cancel(); } catch (_) {} e.target.textContent = `Голос: ${voiceOn ? "вкл" : "выкл"}`; e.target.setAttribute("aria-pressed", voiceOn); };
+$("borgScale").innerHTML = BORG.map(([v, l]) => `<button class="borg-btn" data-v="${v}"><b>${v}</b><span>${l}</span></button>`).join("");
+$("borgScale").addEventListener("click", e => { const b = e.target.closest(".borg-btn"); if (b) rate(+b.dataset.v); });
+$("skip").onclick = () => { next(); render(); };
+$("reset").onclick = () => { stop(); idx = 0; remaining = steps[0].dur; render(); };
+$("sound").onclick = e => { soundOn = !soundOn; e.target.textContent = `Звук: ${soundOn ? "вкл" : "выкл"}`; e.target.setAttribute("aria-pressed", soundOn); };
+$("gen").onclick = generate;
+document.querySelectorAll(".settings input[type=radio]").forEach(i => i.addEventListener("change", build));
+$("cnt").addEventListener("input", e => { $("cntOut").textContent = e.target.value; });
+$("cnt").addEventListener("change", generate);
+$("stations").addEventListener("click", e => { const b = e.target.closest(".swap"); if (b) swapOne(+b.dataset.i); });
+
+function zones() {
+  const age = Math.min(80, Math.max(7, +$("age").value || 19));
+  const max = 220 - age;
+  $("hrmax").textContent = `макс. ≈ ${max} уд/мин`;
+  const conds = selectedConds(), heart = conds.includes("heart"), lfk = conds.length > 0;
+  const z = [
+    ["Разминка, заминка", .5, .6, "var(--blue)"],
+    ["Отдых между станциями", heart ? .5 : .6, heart ? .6 : .7, "var(--rest)"],
+    ["Работа на станции", heart ? .6 : lfk ? .65 : .7, heart ? .7 : lfk ? .75 : .85, "var(--accent)"],
+  ];
+  $("zones").innerHTML = z.map(([n, a, b, c]) => `<div class="zone"><span class="dot" style="background:${c}"></span><span>${n}</span><b>${Math.round(max * a)}–${Math.round(max * b)}</b></div>`).join("");
+}
+$("age").addEventListener("input", zones);
+$("conds").innerHTML = Object.entries(CONDS).map(([k, c]) => `<input type="checkbox" id="c-${k}" value="${k}"><label for="c-${k}">${c.name}</label>`).join("");
+$("conds").addEventListener("change", () => { generate(); zones(); });
+
+$("fEx").textContent = ALL.length;
+$("fLfk").textContent = EX_LFK.length;
+$("fCond").textContent = Object.keys(CONDS).length;
+$("fAnim").textContent = ALL.filter(e => ANIM[e.n]).length;
+// --- Offline helper: answers from the site's own knowledge base, no network, no sign-in ---
+const norm = s => s.toLowerCase().replace(/ё/g, "е").replace(/[^a-zа-я0-9\s]/g, " ");
+const tokens = s => norm(s).split(/\s+/).filter(Boolean);
+// prefix match; "=word" means the exact word
+const hasAny = (tk, keys) => keys.some(k => k[0] === "=" ? tk.includes(k.slice(1)) : tk.some(t => t.startsWith(k)));
+const COND_KEYS = {
+  posture: ["осанк", "сколиоз", "сутул", "позвоноч"],
+  flat: ["плоскостоп", "свод"],
+  myopia: ["близорук", "зрени", "миопи", "=глаз", "глаза"],
+  asthma: ["астм", "бронх", "задыха"],
+  heart: ["сердц", "давлен", "гиперт", "=всд", "тахикард"],
+  weight: ["=вес", "=веса", "=весом", "похуд", "ожирен", "лишн"],
+  knees: ["колен", "сустав", "мениск"],
+};
+const NAME_SKIP = new Set(["на", "с", "в", "от", "для", "через", "до"]);
+const GROUP_MISTAKES = {
+  legs: "колени заваливаются внутрь, пятки отрываются от пола, спина округляется",
+  arms: "провисает поясница, локти разведены слишком широко, задерживается дыхание",
+  core: "тянешь себя за шею, поясница отрывается от пола, рывки вместо плавного движения",
+  cardio: "жёсткое приземление на пятки, сутулая спина, слишком быстрый темп в начале",
+  breath: "на вдохе поднимаются плечи, выдох слишком короткий",
+  eyes: "голова поворачивается вместе с глазами, долго не моргаешь",
+};
+const list = a => a.join(", ");
+const uniqSeq = a => a.filter((x, i) => x !== a[i - 1]);
+
+function findExercise(tk) {
+  const qs = tk.map(t => t.slice(0, 5));
+  let best = null;
+  for (const e of ALL) {
+    const words = tokens(e.n).filter(w => !NAME_SKIP.has(w)).map(w => w.slice(0, 5));
+    const hit = words.filter(w => qs.includes(w)).length;
+    if (!hit) continue;
+    const score = hit + hit / words.length;
+    if (hit / words.length >= 0.5 || hit >= 2) if (!best || score > best.score) best = { e, score };
+  }
+  return best && best.e;
+}
+function findCond(tk) { return Object.keys(COND_KEYS).find(c => hasAny(tk, COND_KEYS[c])); }
+
+function exerciseAnswer(e) {
+  const sel = selectedConds();
+  const cues = CUES[e.n] ? uniqSeq(CUES[e.n]) : [];
+  const bad = Object.keys(CONDS).filter(c => CONDS[c].avoid.includes(e.n)).map(c => CONDS[c].name);
+  const good = Object.keys(CONDS).filter(c => CONDS[c].add.includes(e.n) || CONDS[c].good.includes(e.n)).map(c => CONDS[c].name);
+  const now = sel.filter(c => CONDS[c].avoid.includes(e.n)).map(c => CONDS[c].name);
+  return [
+    `«${e.n}» — группа «${GROUP[e.g]}».`,
+    `Как делать: ${e.t}`,
+    cues.length ? `По фазам: ${cues.join(" → ")}.` : "",
+    `Частые ошибки: ${GROUP_MISTAKES[e.g]}.`,
+    good.length ? `Полезно при: ${list(good)}.` : "",
+    bad.length ? `Не рекомендуется при: ${list(bad)}.` : "",
+    now.length ? `Сейчас это упражнение убрано из твоей тренировки из-за: ${list(now)}.` : "",
+  ].filter(Boolean).join("\n");
+}
+function replaceAnswer(e, cond) {
+  const sel = cond ? [...new Set([...selectedConds(), cond])] : selectedConds();
+  const avoid = new Set(sel.flatMap(c => CONDS[c].avoid));
+  const extra = EX_LFK.filter(x => sel.some(c => CONDS[c].add.includes(x.n)));
+  const inPlan = new Set(plan.map(x => x.n));
+  let opts = EX.concat(extra).filter(x => x.n !== e.n && !avoid.has(x.n) && x.g === e.g && !inPlan.has(x.n));
+  if (opts.length < 2) opts = opts.concat(extra.filter(x => x.n !== e.n && !opts.includes(x)));
+  opts = opts.slice(0, 3);
+  if (!opts.length) return `Подходящей замены для «${e.n}» в базе не нашлось. Спроси преподавателя ЛФК.`;
+  return [
+    `Вместо «${e.n}» можно:`,
+    ...opts.map((x, i) => `${i + 1}. ${x.n} — ${x.t}`),
+    cond ? `Учёл: ${CONDS[cond].name}. Отметь его в настройках, и сайт сам уберёт неподходящие упражнения.` : "Ещё проще: нажми «Заменить упражнение» на карточке станции, и сайт подберёт замену сам.",
+  ].join("\n");
+}
+function condAnswer(c) {
+  const C = CONDS[c], on = selectedConds().includes(c);
+  return [
+    `${C.name}. ${C.why}`,
+    `Лучше не делать: ${list(C.avoid)}.`,
+    `Полезно: ${list([...C.add, ...C.good])}.`,
+    C.gentle ? "Нагрузка щадящая: работа не больше 20 секунд, отдых не меньше 40." : "Нагрузка снижена: работа не больше 30 секунд.",
+    on ? "Этот режим уже включён в твоей тренировке." : `Отметь «${C.name}» в блоке ЛФК, и сайт перестроит тренировку.`,
+  ].join("\n");
+}
+function whyRemovedAnswer() {
+  const sel = selectedConds();
+  if (!sel.length) return "Сейчас заболевания не выбраны, поэтому ничего не убрано. Отметь своё заболевание в блоке «ЛФК» под настройками, и я объясню, что изменилось.";
+  return sel.map(c => `${CONDS[c].name}: ${CONDS[c].why}`).join("\n") + `\nВсего убрано упражнений: ${pool().avoid.size}. Полный список — в блоке «Режим ЛФК».`;
+}
+function pulseAnswer() {
+  const age = Math.min(80, Math.max(7, +$("age").value || 19)), max = 220 - age;
+  const sel = selectedConds(), heart = sel.includes("heart"), lfk = sel.length > 0;
+  const lo = heart ? .6 : lfk ? .65 : .7, hi = heart ? .7 : lfk ? .75 : .85;
+  return [
+    `Для возраста ${age} лет максимальный пульс ≈ ${max} уд/мин (220 − возраст).`,
+    `Во время работы на станции держи ${Math.round(max * lo)}–${Math.round(max * hi)} уд/мин${heart ? " — это ограничение при проблемах с сердцем и давлением" : lfk ? " — щадящий диапазон для ЛФК" : ""}.`,
+    "Как считать: 15 секунд на запястье или шее, умножить на 4.",
+    "Если пульс выше верхней границы — замедлись или отдохни подольше.",
+  ].join("\n");
+}
+function borgAnswer() {
+  const lfk = selectedConds().length > 0, r = Object.entries(ratings);
+  return [
+    "Шкала Борга — оценка того, насколько тяжело: от 6 (совсем легко) до 20 (предел).",
+    `Для тебя оптимально ${lfk ? "11–13 (легко–умеренно, режим ЛФК)" : "12–15"}. Если 16–17, сайт сам снизит нагрузку, если 18 и выше — лучше остановиться.`,
+    r.length ? `Твои оценки: ${r.map(([k, x]) => `круг ${k} — ${x}`).join(", ")}.` : "Оценку можно поставить после круга или кнопкой «Оценить самочувствие».",
+  ].join("\n");
+}
+function weekAnswer() {
+  const sel = selectedConds(), gentle = sel.some(c => CONDS[c].gentle);
+  const total = Math.round(steps.reduce((s, x) => s + x.dur, 0) / 60);
+  return [
+    `План на неделю (тренировка на сайте ≈ ${total} мин):`,
+    `Пн — круговая тренировка с сайта + разминка и заминка по 5 минут.`,
+    `Вт — спокойная ходьба ${gentle ? "20" : "30"} минут${sel.includes("asthma") || sel.includes("heart") ? " и дыхательные упражнения" : ""}.`,
+    `Ср — круговая тренировка${sel.length ? " (режим ЛФК)" : ""}.`,
+    `Чт — растяжка и лечебные упражнения${sel.length ? ": " + list(pool().added.map(x => x.n).slice(0, 3)) : " 15 минут"}.`,
+    `Пт — круговая тренировка. После каждой оцени самочувствие по Боргу.`,
+    "Сб — активный отдых: прогулка, плавание, велосипед в спокойном темпе.",
+    "Вс — отдых.",
+    gentle ? "Нагрузку повышай очень постепенно и только если оценка по Боргу не выше 13." : "Если две недели подряд всё даётся легко (Борг ниже 11), переходи на уровень выше.",
+  ].join("\n");
+}
+const ANSWERS = {
+  safety: "Сразу остановись. Сядь или спокойно походи, дыши медленно: вдох носом, длинный выдох ртом. Если боль в груди, сильное головокружение, тошнота или одышка не проходят за пару минут — скажи преподавателю и обратись к врачу. Продолжать тренировку сегодня не стоит.",
+  breath: "Главное правило: усилие — на выдохе, возвращение — на вдохе. Например, в приседаниях: вниз — вдох, вверх — выдох; в отжиманиях: вниз — вдох, вверх — выдох.\nВдох носом, выдох ртом. Не задерживай дыхание, особенно в планке и при повышенном давлении.\nЕсли дыхание сбилось так, что трудно говорить, — замедлись. При астме добавь «Диафрагмальное дыхание» и держи ингалятор рядом.",
+  warmup: "Разминка (5 минут): ходьба на месте 1 минута, вращения головы, плеч, локтей, кистей, таза, коленей и стоп по 5–8 раз, лёгкие наклоны в стороны, 10 спокойных приседаний.\nЗаминка (3–5 минут): спокойная ходьба, пока пульс не снизится, затем растяжка ног, спины и рук по 15–20 секунд без рывков.",
+  howto: "Как пользоваться: выбери уровень, количество станций и кругов, отметь заболевание в блоке «ЛФК», нажми «Старт». Таймер ведёт по станциям, голос подсказывает, что делать, анимация показывает технику. После круга оцени самочувствие по шкале Борга.",
+  hello: "Привет! Я помощник ЛФК. Спроси, например:\n— как правильно делать приседания;\n— чем заменить выпады, если болит колено;\n— что нельзя при сколиозе;\n— какой у меня должен быть пульс;\n— составь план на неделю.",
+  thanks: "Пожалуйста! Хорошей тренировки. Если что-то заболит — остановись и скажи преподавателю.",
+};
+function answer(q) {
+  const tk = tokens(q);
+  if (!tk.length) return ANSWERS.hello;
+  const ex = /(эт|перв|текущ|сейчас)/.test(q) && /упражн/.test(q) && !findExercise(tk) ? plan[steps[idx]?.ex ?? 0] : findExercise(tk);
+  const cond = findCond(tk);
+  if (hasAny(tk, ["бол", "головокруж", "круж", "тошн", "плохо", "дурно", "темнеет", "колет", "слабост"]) && !ex && !hasAny(tk, ["замен", "вместо"])) {
+    return cond ? ANSWERS.safety + "\n\n" + condAnswer(cond) : ANSWERS.safety;
+  }
+  const week = hasAny(tk, ["недел", "расписан", "=план", "=плана", "=планы"]) || (hasAny(tk, ["=часто", "сколько"]) && hasAny(tk, ["=раз", "занима", "трениров"]));
+  if (week) return weekAnswer();
+  if (ex && hasAny(tk, ["замен", "вместо", "альтерн", "нельзя", "не могу", "трудно", "бол"])) return replaceAnswer(ex, cond);
+  if (hasAny(tk, ["почему", "зачем"]) && hasAny(tk, ["убран", "убрал", "нет", "пропал", "исчез", "нельзя"]) && !ex) return cond ? condAnswer(cond) : whyRemovedAnswer();
+  if (ex && hasAny(tk, ["дыш", "дыхан", "вдох", "выдох"])) {
+    const br = (CUES[ex.n] || []).filter(c => /вдох|выдох/.test(c));
+    return (br.length ? `Дыхание в «${ex.n}»: ${uniqSeq(br).join(" → ")}.` : `В «${ex.n}» дыши ровно и спокойно, не задерживай дыхание.`) + "\nОбщее правило: усилие — на выдохе, возвращение — на вдохе. Вдох носом, выдох ртом.";
+  }
+  if (ex) return exerciseAnswer(ex);
+  if (cond) return condAnswer(cond);
+  if (hasAny(tk, ["дыш", "дыхан", "вдох", "выдох"])) return ANSWERS.breath;
+  if (hasAny(tk, ["пульс", "чсс", "сердцебиен", "удар"])) return pulseAnswer();
+  if (hasAny(tk, ["борг", "самочув", "тяжел", "устал", "нагрузк", "легко"])) return borgAnswer();
+  if (hasAny(tk, ["размин", "заминк", "растяж", "разогре"])) return ANSWERS.warmup;
+  if (hasAny(tk, ["пользов", "таймер", "работает", "сайт", "старт", "кнопк"])) return ANSWERS.howto;
+  if (hasAny(tk, ["спасиб", "благодар"])) return ANSWERS.thanks;
+  if (hasAny(tk, ["привет", "здравств", "умеешь", "можешь", "помощ", "кто"])) return ANSWERS.hello;
+  return "Пока не понял вопрос. Я умею рассказывать о технике любого упражнения с сайта, подбирать замену, объяснять ограничения при заболеваниях, считать пульс и составлять план на неделю. Попробуй спросить, например: «Как делать планку?» или «Что нельзя при плоскостопии?»";
+}
+
+let typing = null;
+function coachChips() {
+  const first = plan[0], sel = selectedConds();
+  const qs = [
+    first && `Как правильно делать «${first.n}»?`,
+    first && `Чем заменить «${first.n}»?`,
+    sel.length ? "Почему убраны эти упражнения?" : "Что нельзя при сколиозе?",
+    "Какой у меня должен быть пульс?",
+    "Как правильно дышать?",
+    "Составь план на неделю",
+  ].filter(Boolean);
+  $("coachChips").innerHTML = qs.map(q => `<button type="button">${q}</button>`).join("");
+}
+function askCoach(question) {
+  question = question.trim();
+  if (!question) return;
+  clearInterval(typing);
+  const log = $("coachLog");
+  log.querySelectorAll(".msg.bot.typing").forEach(m => { m.textContent = m.dataset.full; m.classList.remove("typing"); });
+  const u = document.createElement("div"); u.className = "msg user"; u.textContent = question;
+  const b = document.createElement("div"); b.className = "msg bot typing";
+  const full = answer(question);
+  b.dataset.full = full;
+  log.append(u, b);
+  while (log.children.length > 12) log.firstElementChild.remove();
+  let n = 0;
+  const step = () => { n = Math.min(full.length, n + 4); b.textContent = full.slice(0, n); if (n >= full.length) { clearInterval(typing); b.classList.remove("typing"); } };
+  if (REDUCED) { b.textContent = full; b.classList.remove("typing"); } else typing = setInterval(step, 16);
+  b.scrollIntoView({ block: "nearest", behavior: REDUCED ? "auto" : "smooth" });
+}
+$("coachForm").addEventListener("submit", e => { e.preventDefault(); const q = $("coachInput").value; $("coachInput").value = ""; askCoach(q); });
+$("coachChips").addEventListener("click", e => { const b = e.target.closest("button"); if (b) askCoach(b.textContent); });
+
+const SITE_URL = /^https?:/.test(location.protocol) ? location.href.split("#")[0] : "";   // QR points wherever the site is hosted
+try {
+  if (!SITE_URL) throw 0;
+  $("qr").innerHTML = "";
+  new QRCode($("qr"), { text: SITE_URL, width: 256, height: 256, colorDark: "#0F1C2E", colorLight: "#FFFFFF", correctLevel: QRCode.CorrectLevel.M });
+} catch (_) { $("qr").closest(".qr-box").hidden = true; }
+
+generate();
+zones();
+const animTimer = REDUCED ? null : setInterval(animate, 33);
+window.__krugCleanup = () => { cancelled = true; stop(); clearInterval(animTimer); figs.clear(); };
+})();
+</script>
+
+</body>
+</html>
